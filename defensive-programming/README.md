@@ -897,7 +897,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     client_socket.sendall("message".encode('utf-8'))
     data = client_socket.recv(1024)
 ```
-### Server - Using threadsd
+### Server - Using threads
 ```python
 import socket
 import threading
@@ -985,8 +985,8 @@ print(value)
 
 ## Security in Python 
 - `eval(code)` - runs arbitrary code, dangerous because of potential malicious code injection.
-- `input()` - in version 2 it gets user input but can also get variables values. 
-  If a variable `password = 123` exists then and the user inputs `password` then the return value will be `123`.
+- `input()` - in python 2 it gets user input and is interpreted as code. 
+  If a variable `password = 123` exists and the user inputs `password` then the return value will be `123`. `raw_input()` should be used in python 2.
 - Pickle module - serializes code, dangerous because an attacker can run code on target (deserilizer) machine
 
 ---
