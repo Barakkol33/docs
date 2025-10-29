@@ -15,6 +15,48 @@ In distributed systems and client-server architectures, errors can occur due to 
 * **Flexibility:** Write modular, reusable components that can evolve.
 * **Use Cases:** Define concrete user stories to clarify expected behavior.
 
+## User Stories
+
+Use cases and user stories describe *what the user wants to do* and *why*, helping designers and developers understand **functional requirements** and **user behavior**.
+
+### Examples
+
+#### General
+
+1. *As a shopper, I want to save items to a wishlist so that I can buy them later.*
+2. *As a new user, I want to sign up with Google so that I don’t have to create a new password.*
+3. *As a team manager, I want to export my team’s activity data so that I can analyze performance offline.*
+
+#### Detailed
+
+1. **Name:** “Add item to cart”
+   **Actor:** Shopper
+   **Precondition:** User is logged in and viewing a product.
+   **Main Flow:**
+
+   1. User clicks “Add to Cart.”
+   2. System adds the item to the active shopping cart.
+   3. System updates the cart icon count and shows confirmation.
+      **Alternate Flow:** If item is out of stock, system displays an error message.
+
+2. **Name:** “Reset Password”
+   **Actor:** Registered user
+   **Flow:**
+
+   1. User clicks “Forgot Password.”
+   2. System prompts for email.
+   3. User receives a reset link and sets a new password.
+
+### Security Prespective
+* **Abuse/misuse cases** (for identifying and mitigating attacks)
+
+#### Example
+
+> *Attacker tries to brute-force login credentials.*
+>
+> * **Threat:** Repeated failed login attempts.
+> * **Mitigation:** Implement rate limiting and temporary account lockout.
+
 ---
 
 # Object-Oriented Programming (OOP)
@@ -273,6 +315,7 @@ int main() {
 ## Classes 
 - `const` function - means that object properties cannot be changed.
   `const` reference to object - only `const` functions can be used.
+- Use public inheritence because then your users can use the public members of the moether class.
 
 ```cpp
 #include <iostream>
@@ -391,8 +434,6 @@ int main() {
 
 ## VTABLE — Virtual Function Table
 
-### 🔹 What it is
-
 A **vtable** (virtual table) is a hidden mechanism that Cpp uses to implement **runtime polymorphism** for classes with **virtual functions**.
 
 When a class has at least one `virtual` function:
@@ -401,8 +442,6 @@ When a class has at least one `virtual` function:
 * Each object of that class stores a hidden pointer (`vptr`) to its class’s vtable.
 * At runtime, the correct function is called through that table, based on the actual type of the object (not the pointer type).
 * The vtable is essentially an array of pointers to functions and is located at offset 0 of the object's memory.
-
----
 
 ### Example
 
@@ -427,11 +466,7 @@ int main() {
 }
 ```
 
-**Output:**
-
-```
-Derived speaks
-```
+Output: `Derived speaks`
 
 If there were no `virtual`, it would instead call `Base::speak()` (static binding).
 So the **vtable** enables **dynamic dispatch**.
@@ -440,6 +475,60 @@ In memory, the bytes at `*obj` are the pointer to `Derived::speak()`.
 
 If there were more function their pointers would be at *(obj + 4), *(obj + 8), etc (assuming 32 bit architecture).
 
+--
+
+## Excptions
+
+```cpp
+#include <iostream>
+#include <exception>
+#include <string>
+
+// Custom exception
+class MyException : public std::exception {
+private:
+    std::string message;
+public:
+    MyException(const std::string& msg) : message(msg) {}
+
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+
+int main() {
+    try {
+        std::cout << "Starting program..." << std::endl;
+
+        int scenario = 0;
+        std::cin >> scenario;
+
+        if (scenario == 1)
+            throw MyException("custom");
+        else if (scenario == 2)
+            throw std::runtime_error("runtime");
+        else if (scenario == 3)
+            throw std::exception("generic");
+        else if (scenario == 4)
+            // This runs but please don't do it.
+            throw 1;
+
+        std::cout << "Program finished normally." << std::endl;
+    }
+    catch (const MyException& e) {
+        std::cerr << "[MyException caught] " << e.what() << std::endl;
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << "[std::runtime_error caught] " << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "[Unknown exception caught]" << std::endl;
+    }
+
+    std::cout << "Program continues after catch." << std::endl;
+    return 0;
+}
+```
 
 -- 
 
@@ -655,12 +744,12 @@ int main() {
 }
 ```
 
-### cryptopp
+### Cryptopp
 Download and extract -https://www.cryptopp.com/ -> Downloads
 
 Build and add lib to link libraries, add directory as include directory.
 
-### boost
+### Boost
 Download and extract - https://www.boost.org/releases/latest/
 
 Note: To use `asio` you don't need to build it.
@@ -672,7 +761,186 @@ Note: To use `asio` you don't need to build it.
 ## Docs
 https://docs.python.org/3/tutorial
 
-## Networking with select Example
+## Examples
+```python
+import string
+import random
+
+# Base Class
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def __str__(self):
+        # Defines what str(obj) returns
+        return f"Person(name={self.name}, age={self.age}, traits={self.traits})"
+
+    def __getattr__(self, item):
+        # Called *only if* attribute not found normally
+        print(f"[__getattr__] '{item}' not found, returning default None")
+        return None
+
+    def __getattribute__(self, item):
+        # Called for *every* attribute access
+        print(f"[__getattribute__] Accessing '{item}'")
+        return super().__getattribute__(item)
+
+    def __setattr__(self, key, value):
+        # Called for every attribute assignment
+        print(f"[__setattr__] Setting '{key}' = {value}")
+        super().__setattr__(key, value)
+
+
+# Derived Class
+class Student(Person):
+    def __init__(self, name , age, grades):
+        super().__init__(name, age)
+        self.grades = grades
+
+    def add_grade(self, grade):
+        self.grades.append(grade)
+
+    def get_grades(self):
+        return self.grades
+
+
+# Function example
+# - Required parameters
+# - Optional parameters
+# - kwargs - generic arguments in form a,b,c   
+# - kwargs - generic arguments in form k1=v1,k2=v2,
+def func(name, age=0, *args, **kwargs):
+    print({"name": name, "age": age, "args": args, "kwargs": kwargs})
+
+# Decorator - a function that gets a function and returns a wrapper function.
+def timer_decorator(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"Function '{func.__name__}' executed in {end_time - start_time:.4f} seconds.")
+        return result
+    return wrapper
+
+def main():
+    # Dictionaries 
+    details = {"major": "Computer Science", "year": 2}
+    year = details["year"]
+    for key, value in details.items():
+        print(f"{key}={value}")
+    
+    # Lists
+    lst = [1,2,4]
+    lst.insert(2, 3)
+    lst.append(5)
+    print(sum(lst))
+
+    # Strings
+    # Constants
+    chars = string.ascii_letters + string.digits
+
+    # Random choice
+    print(random.choice(chars))
+
+    # Functions
+    func("bob")
+    func("bob", 1)
+    func(name="bob", age=1)
+    func("bob", 1, 2, 3, d=4, e=5)
+    
+    # Objects
+    s = Student("Alice", 20, [70, 80])
+    s.add_grade(95)        
+    print(s.get_grades())
+
+    print("\n--- Access attributes (triggering __getattribute__) ---")
+    print(s.name)
+    print(s.age)
+
+    print("\n--- Access a missing attribute (trigger __getattr__) ---")
+    print(s.non_existent_field)
+
+    print("\n--- Print object (trigger __str__) ---")
+    print(s)
+
+    print("===== metaprogramming =====") 
+    print(f"Object attributes: {dir(s)}")
+    print(f"Object class: {s.__class__}")
+    print(f"Object base classes: {s.__class.__.__bases__}")
+
+    # Decorating all the methods of an object:
+    # @classmethod
+    # def class_method(cls):
+    #     for attribute, item in cls.__dict__.items():
+    #         if callable(item):
+    #             setattr(cls,attr,decorator(item))
+    
+
+
+if __name__ == "__main__":
+    main()
+```
+
+## Networking 
+### Client 
+```python
+import socket
+
+HOST = "127.0.0.1"
+PORT = 5000
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+    client_socket.connect((HOST, PORT))
+    
+    # sendall is better than send - actually sends all information  
+    client_socket.sendall("message".encode('utf-8'))
+    data = client_socket.recv(1024)
+```
+### Server - Using threadsd
+```python
+import socket
+import threading
+
+HOST = "127.0.0.1"
+PORT = 5000       
+
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+    with conn:
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break  # client disconnected
+            message = data.decode('utf-8')
+            print(f"[{addr}] {message}")
+            conn.sendall(f"Echo: {message}".encode('utf-8'))
+    print(f"[DISCONNECT] {addr} disconnected.")
+
+
+def main():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
+    print(f"[LISTENING] Server listening on {HOST}:{PORT}")
+
+    try:
+        while True:
+            conn, addr = server_socket.accept()
+            thread = threading.Thread(target=handle_client, args=(conn, addr))
+            thread.start()
+            print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+    except KeyboardInterrupt:
+        print("\n[SERVER SHUTDOWN]")
+    finally:
+        server_socket.close()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+### Server - Using select
 
 ```python
 import socket, select
@@ -714,6 +982,12 @@ print(packed)
 value, = struct.unpack('<L', packed)
 print(value)
 ```
+
+## Security in Python 
+- `eval(code)` - runs arbitrary code, dangerous because of potential malicious code injection.
+- `input()` - in version 2 it gets user input but can also get variables values. 
+  If a variable `password = 123` exists then and the user inputs `password` then the return value will be `123`.
+- Pickle module - serializes code, dangerous because an attacker can run code on target (deserilizer) machine
 
 ---
 
