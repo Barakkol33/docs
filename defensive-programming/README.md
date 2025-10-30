@@ -10,14 +10,14 @@ In distributed systems and client-server architectures, errors can occur due to 
 
 # Programming Concepts
 
-* **Correctness:** Code should meet its specifications under all valid inputs.
-* **Complexity:** Keep algorithms efficient and the codebase simple.
-* **Flexibility:** Write modular, reusable components that can evolve.
-* **Use Cases:** Define concrete user stories to clarify expected behavior.
+* Correctness: Code should meet its specifications under all valid inputs.
+* Complexity: Keep algorithms efficient and the codebase simple.
+* Flexibility: Write modular, reusable components that can evolve.
+* Use Cases: Define concrete user stories to clarify expected behavior.
 
 ## User Stories
 
-Use cases and user stories describe *what the user wants to do* and *why*, helping designers and developers understand **functional requirements** and **user behavior**.
+Use cases and user stories describe *what the user wants to do* and *why*, helping designers and developers understand functional requirements and user behavior.
 
 ### Examples
 
@@ -29,33 +29,31 @@ Use cases and user stories describe *what the user wants to do* and *why*, helpi
 
 #### Detailed
 
-1. **Name:** “Add item to cart”
-   **Actor:** Shopper
-   **Precondition:** User is logged in and viewing a product.
-   **Main Flow:**
-
+1. Name: “Add item to cart”  
+   Actor: Shopper  
+   Precondition: User is logged in and viewing a product.  
+   Flow:
    1. User clicks “Add to Cart.”
    2. System adds the item to the active shopping cart.
    3. System updates the cart icon count and shows confirmation.
-      **Alternate Flow:** If item is out of stock, system displays an error message.
+      Alternate Flow: If item is out of stock, system displays an error message.
 
-2. **Name:** “Reset Password”
-   **Actor:** Registered user
-   **Flow:**
-
+2. Name: “Reset Password”  
+   Actor: Registered user  
+   Flow:  
    1. User clicks “Forgot Password.”
    2. System prompts for email.
    3. User receives a reset link and sets a new password.
 
 ### Security Prespective
-* **Abuse/misuse cases** (for identifying and mitigating attacks)
+* Abuse/misuse cases (for identifying and mitigating attacks)
 
 #### Example
 
-> *Attacker tries to brute-force login credentials.*
->
-> * **Threat:** Repeated failed login attempts.
-> * **Mitigation:** Implement rate limiting and temporary account lockout.
+Attacker tries to brute-force login credentials.
+
+- Threat: Repeated failed login attempts.
+-  Mitigation: Implement rate limiting and temporary account lockout.
 
 ---
 
@@ -63,11 +61,11 @@ Use cases and user stories describe *what the user wants to do* and *why*, helpi
 
 ### Core Concepts
 
-* **Class:** Blueprint for objects.
-* **Object:** Instance of a class.
-* **Encapsulation:** Hide internal state behind public methods.
-* **Inheritance:** Reuse and extend base functionality.
-* **Polymorphism:** Common interface, different implementations.
+* Class: Blueprint for objects.
+* Object: Instance of a class.
+* Encapsulation: Hide internal state behind public methods.
+* Inheritance: Reuse and extend base functionality.
+* Polymorphism: Common interface, different implementations.
 
 ### UML
 
@@ -182,15 +180,15 @@ When a Cpp program runs, memory is divided into regions:
 
 | Region                      | Purpose                                                         | Example                                         |
 | --------------------------- | --------------------------------------------------------------- | ----------------------------------------------- |
-| **Code / Text Segment**     | Stores compiled instructions (functions).                       | `main()` machine code lives here.               |
-| **Static / Global Segment** | Stores global and static variables.                             | `static int counter = 0;`                       |
-| **Heap**                    | Dynamically allocated memory (`new`, `malloc`, smart pointers). | `int* p = new int(10);`                         |
-| **Stack**                   | Function calls, local variables, return addresses.              | Inside `main()`, local `int x = 5;` lives here. |
+| Code / Text Segment     | Stores compiled instructions (functions).                       | `main()` machine code lives here.               |
+| Static / Global Segment | Stores global and static variables.                             | `static int counter = 0;`                       |
+| Heap                    | Dynamically allocated memory (`new`, `malloc`, smart pointers). | `int* p = new int(10);`                         |
+| Stack                   | Function calls, local variables, return addresses.              | Inside `main()`, local `int x = 5;` lives here. |
 
 ### Growth Direction
 
-* **Stack** grows **downward** (toward lower memory addresses).
-* **Heap** grows **upward** (toward higher addresses).
+* Stack grows downward (toward lower memory addresses).
+* Heap grows upward (toward higher addresses).
   They expand toward each other — a full memory collision = stack/heap overflow.
 
 ```
@@ -209,7 +207,7 @@ When a Cpp program runs, memory is divided into regions:
 
 ## Endianness: Little Endian Explained
 
-**Little Endian** means the **least significant byte (LSB)** is stored first (at the lowest address).
+Little Endian means the least significant byte (LSB) is stored first (at the lowest address).
 
 Example:
 
@@ -223,13 +221,13 @@ Memory layout (addresses increasing →):
 78 56 34 12
 ```
 
-**Big Endian** would store:
+Big Endian would store:
 
 ```
 12 34 56 78
 ```
 
-Most modern PCs (x86, ARM) are **Little Endian**.
+Most modern PCs (x86, ARM) are Little Endian.
 
 ---
 
@@ -262,12 +260,12 @@ int main() {
 
 | Term                                 | Definition                                                                                          | Example                              |
 | ------------------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| **lvalue reference (`T&`)**          | Refers to an existing object (has address).                                                         | `int x = 5; int& r = x;`             |
-| **rvalue reference (`T&&`)**         | Refers to a temporary or movable value. Used for move semantics.                                    | `int&& temp = 10;`                   |
-| **`std::move`**                      | Casts an lvalue to an rvalue reference, allowing resources to be moved.                             | `vec2 = std::move(vec1);`            |
-| **Smart pointer vs Regular pointer** | Smart pointers manage memory automatically; raw pointers require manual `delete` - Shouldn't be used together to avoid bugs.                   | `new/delete` vs `std::unique_ptr`    |
-| **`std::unique_ptr`**                | Smart pointer that owns an object exclusively (no copies). Automatically deletes when out of scope. | `auto p = std::make_unique<int>(5);` |
-| **`std::shared_ptr`**                | Smart pointer that uses reference counting; multiple owners.                                        | `auto p = std::make_shared<int>(5);` |
+| lvalue reference (`T&`)          | Refers to an existing object (has address).                                                         | `int x = 5; int& r = x;`             |
+| rvalue reference (`T&&`)         | Refers to a temporary or movable value. Used for move semantics.                                    | `int&& temp = 10;`                   |
+| `std::move`                      | Casts an lvalue to an rvalue reference, allowing resources to be moved.                             | `vec2 = std::move(vec1);`            |
+| Smart pointer vs Regular pointer | Smart pointers manage memory automatically; raw pointers require manual `delete` - Shouldn't be used together to avoid bugs.                   | `new/delete` vs `std::unique_ptr`    |
+| `std::unique_ptr`                | Smart pointer that owns an object exclusively (no copies). Automatically deletes when out of scope. | `auto p = std::make_unique<int>(5);` |
+| `std::shared_ptr`                | Smart pointer that uses reference counting; multiple owners.                                        | `auto p = std::make_shared<int>(5);` |
 
 ### `std::unique_ptr` Example
 
@@ -434,11 +432,11 @@ int main() {
 
 ## VTABLE — Virtual Function Table
 
-A **vtable** (virtual table) is a hidden mechanism that Cpp uses to implement **runtime polymorphism** for classes with **virtual functions**.
+A vtable (virtual table) is a hidden mechanism that Cpp uses to implement runtime polymorphism for classes with virtual functions.
 
 When a class has at least one `virtual` function:
 
-* The compiler generates a **vtable** — a table of function pointers.
+* The compiler generates a vtable — a table of function pointers.
 * Each object of that class stores a hidden pointer (`vptr`) to its class’s vtable.
 * At runtime, the correct function is called through that table, based on the actual type of the object (not the pointer type).
 * The vtable is essentially an array of pointers to functions and is located at offset 0 of the object's memory.
@@ -469,7 +467,7 @@ int main() {
 Output: `Derived speaks`
 
 If there were no `virtual`, it would instead call `Base::speak()` (static binding).
-So the **vtable** enables **dynamic dispatch**.
+So the vtable enables dynamic dispatch.
 
 In memory, the bytes at `*obj` are the pointer to `Derived::speak()`.
 
@@ -561,7 +559,7 @@ int main() {
 }
 ```
 
-## **`std::map` — Key–Value Operations**
+## `std::map` — Key–Value Operations
 
 ```cpp
 #include <iostream>
@@ -810,14 +808,14 @@ class Student(Person):
 # - Optional parameters
 # - kwargs - generic arguments in form a,b,c   
 # - kwargs - generic arguments in form k1=v1,k2=v2,
-def func(name, age=0, *args, **kwargs):
+def func(name, age=0, *args, kwargs):
     print({"name": name, "age": age, "args": args, "kwargs": kwargs})
 
 # Decorator - a function that gets a function and returns a wrapper function.
 def timer_decorator(func):
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, kwargs):
         start_time = time.time()
-        result = func(*args, **kwargs)
+        result = func(*args, kwargs)
         end_time = time.time()
         print(f"Function '{func.__name__}' executed in {end_time - start_time:.4f} seconds.")
         return result
@@ -888,14 +886,15 @@ if __name__ == "__main__":
 import socket
 
 HOST = "127.0.0.1"
-PORT = 5000
+PORT = 1234
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
     client_socket.connect((HOST, PORT))
     
     # sendall is better than send - actually sends all information  
-    client_socket.sendall("message".encode('utf-8'))
+    client_socket.sendall("Hello World".encode('utf-8'))
     data = client_socket.recv(1024)
+    print(data)
 ```
 ### Server - Using threads
 ```python
@@ -943,29 +942,38 @@ if __name__ == "__main__":
 ### Server - Using select
 
 ```python
-import socket, select
+import selectors
+import socket
+selector = selectors.DefaultSelector()
 
-server = socket.socket()
-server.bind(('0.0.0.0', 5000))
-server.listen()
+def accept_client(socket_, mask):
+    client_socket, client_address = socket_.accept() 
+    print(f"New connection from {client_address}")
+    client_socket.setblocking(False)
+    selector.register(client_socket, selectors.EVENT_READ, read_client)
 
-sockets = [server]
-print("Listening...")
+def read_client(client_socket, mask):
+    data = client_socket.recv(1024)
+    if data:
+        print(f"Echo: {data}")
+        client_socket.sendall(data) 
+    else:
+        print(f"Closed connection: {client_socket}")
+        selector.unregister(client_socket)
+        client_socket.close()
+
+server_socket = socket.socket()
+server_socket.bind(('localhost', 1234))
+server_socket.listen(100)
+server_socket.setblocking(False)
+selector.register(server_socket, selectors.EVENT_READ, accept_client)
 
 while True:
-    readable, _, _ = select.select(sockets, [], [])
-    for s in readable:
-        if s is server:
-            conn, addr = s.accept()
-            sockets.append(conn)
-            print("New connection:", addr)
-        else:
-            data = s.recv(1024)
-            if not data:
-                sockets.remove(s)
-                s.close()
-            else:
-                print("Received:", data.decode())
+    events = selector.select()
+    for key, mask in events:
+        callback = key.data
+        callback(key.fileobj, mask) 
+
 ```
 
 ---
@@ -991,48 +999,107 @@ print(value)
 
 ---
 
+# SQL
+
+SQL, or Structured Query Language, is a domain-specific programming language designed for managing and manipulating relational databases. It is the standard language used to interact with and extract information from these databases. 
+
+## Features 
+- Relational Database Management Systems (RDBMS): SQL is primarily used with RDBMS, which store data in a structured, tabular format with rows and columns. Examples include MySQL, Oracle, PostgreSQL, and Microsoft SQL Server.
+
+- Standardization: SQL is an ANSI and ISO standard, ensuring a degree of consistency across different database systems, although specific implementations may have proprietary extensions.
+
+### Data Manipulation:
+SQL allows users to perform various operations on data, such as:
+- Retrieving data: Using SELECT statements to extract specific information based on criteria.
+- Inserting data: Using INSERT INTO to add new records to tables.
+- Updating data: Using UPDATE to modify existing records.
+- Deleting data: Using DELETE to remove records from tables.
+
+### Database Structure Management
+SQL can also be used to define and modify the structure of a database, including:
+- Creating tables: Using CREATE TABLE to define new tables.
+- Modifying tables: Using ALTER TABLE to add, modify, or delete columns.
+- Deleting tables: Using DROP TABLE to remove tables from the database.
+
+TODO: useful statements
+
+---
+
 # Security
+
+## Definitions
+- Bug - A *bug* is an unintended flaw or error in software that causes it to behave incorrectly.
+- Vulnerability - A *vulnerability* is a weakness in software or a system that can be exploited to cause unintended behavior — often leading to unauthorized access, data leaks, or service disruption.
+- Exploiting - *Exploiting* (or *an exploit*) is the act or method of taking advantage of a vulnerability to achieve a malicious goal — such as executing arbitrary code or escalating privileges.
+- Mitigation - *Mitigation* refers to techniques or controls that reduce the risk or impact of a vulnerability or attack.
+- Security - *Security* in a system context means the protection of information and operations against unauthorized access, use, modification, or destruction.
+- Reliability - *Reliability* means the system consistently performs its intended functions under expected conditions.
+- Privacy - *Privacy* is about protecting personal or sensitive information from being disclosed without consent.
+- Run-Time Environment - A *runtime environment* is the context in which a program executes — including the system libraries, memory layout, permissions, and interpreter or virtual machine.
+- Sandbox - A *sandbox* is an isolated environment for running code safely, so it can’t affect the rest of the system.
+
+TODO: threat tree
 
 ## Buffer Overflow
 
-**Cause:** Writing past array bounds.
+Writing past array bounds.
 
-**Prevention:**
+Bug? 
 
-* Use `strncpy`, `memcpy_s` in C/Cpp.
-* Enable **stack canaries** and **ASLR**.
-* Use safe containers like `std::string`.
+### Examples
+- When logining in and entering a username, write a long answer so that the password field will be overriden.
+- Writing into the vtable of an object so we the actual called function will be differnet
+- stack cannary
+
+### Mitigations
+
+- Use `strncpy`, `memcpy_s` in C/Cpp.
+- Enable stack canaries and ASLR.
+- Use safe containers like `std::string`.
 
 ---
 
 ## Side-Channel Attacks
 
-**Cause:** Leaking info via timing or power analysis.
+Leaking info via timing or power analysis.
 
-**Prevention:**
+Bug?: 
+
+### Examples
+
+### Mitigations
 
 * Use constant-time cryptographic operations.
 * Isolate sensitive code (TPM, hardware modules).
+- use clock to control random number generation
+- get private keys
 
 ---
 
 ## Denial of Service (DoS)
 
-**Cause:** Flooding server with requests.
+Flooding server with requests.
 
-**Prevention:**
+Bug?:
+
+### Examples
+
+### Prevention
 
 * Rate limiting.
-* Timeouts and circuit breakers.
-* Use non-blocking I/O (e.g. `select`, reactor pattern).
+* Timeouts and circuit breakers (TODO explain)
+* Create scalable code - does not require more resources if getting a lot of requests (e.g. `select`, reactor pattern).
 
 ---
 
 ## SQL Injection
 
-**Cause:** Unsanitized user input.
 
-**Prevention:**
+Bug?: Unsanitized user input.
+
+### Examples
+
+### Prevention
 
 * Use parameterized queries (`cursor.execute(query, params)`).
 * Validate input types.
@@ -1042,9 +1109,16 @@ print(value)
 
 ## Heap Spraying
 
-**Cause:** Filling heap with attacker-controlled data to predict memory layout.
+Filling heap with attacker-controlled data to predict memory layout.
 
-**Prevention:**
+Bug?: 
+
+### Examples
+
+### Prevention
+
+
+Prevention:
 
 * Enable ASLR and DEP.
 * Use safe allocators.
@@ -1054,9 +1128,15 @@ print(value)
 
 ## Return Oriented Programming (ROP)
 
-**Cause:** Reusing existing code (gadgets) for malicious execution.
+Reusing existing code (gadgets) for malicious execution.
 
-**Prevention:**
+Bug?: 
+
+### Examples
+
+### Prevention
+
+Prevention:
 
 * Enable ASLR and Control Flow Integrity.
 * Use non-executable stack/heap.
@@ -1066,27 +1146,201 @@ print(value)
 
 ## Remote Code Execution (RCE)
 
-**Cause:** Unsafely executing user-supplied code.
+Unsafely executing user-supplied code.
 
-**Prevention:**
+### Examples
 
-* Never use `eval` or `exec` on untrusted data.
-* Disable imports: `exec(code, {'__builtins__': None}, {})`.
-* Use sandboxing or virtual machines.
+code injection
+
+### Prevention
+
+- limit code execution scope - exec(code, globals(), locals())
+- Never use `eval` or `exec` on untrusted data.
+- Disable imports: `exec(code, {'__builtins__': None}, {})`.
+    - Trying to bypass import limit - (2,3).__class__.__base__.__subclasses__()
+- Use sandboxing or virtual machines.
+
+Bug?: 
 
 ---
 
-## Summary of Protections
+# Mitigations
 
-| Attack          | Protection                                 |
-| --------------- | ------------------------------------------ |
-| Buffer Overflow | Stack canary, ASLR, bounds checking        |
-| Side Channel    | Constant-time operations, TPM              |
-| DoS             | Rate limiting, async I/O                   |
-| SQL Injection   | Parameterized queries                      |
-| Heap Spraying   | ASLR, DEP                                  |
-| ROP             | Non-executable memory, CFI                 |
-| RCE             | Sandbox, disable `eval`, restrict builtins |
+## ASLR 
+
+Address Space Layout Randomization (ASLR) randomizes memory layout (stack, heap, libraries, executable base) so that attackers cannot predict addresses needed for many memory corruption exploits.
+
+### Implementation
+
+- How it works: OS kernel chooses randomized offsets when mapping libraries, heap, stack; combined with other mitigations (NX, DEP) it greatly raises the difficulty of code reuse attacks.
+- How to disable it in linux (testing only; disabling in production is unsafe): `echo 0 | sudo tee /proc/sys/kernel/randomize_va_space`) (`echo 1` to enable).
+
+## Analysis (static and dynamic) 
+
+Static analysis examines program code or binaries without executing them (linting, SAT/SMT-based checks, pattern matching).  
+
+Dynamic analysis inspects program behavior at runtime (fuzzing, instrumentation, debuggers, runtime monitoring). Both are analysis methods used to find defects and vulnerabilities.
+
+### Implementation
+
+- Static analysis
+
+  - Tools: linters, type checkers, static analyzers, binary scanners.
+  - Strengths: early detection, broad code coverage, no need to run untrusted code.
+  - Weaknesses: false positives, limited visibility into runtime behavior and environment-specific bugs.
+- Dynamic analysis
+
+  - Tools: fuzzers, sanitizers (ASAN, UBSAN), debuggers, instrumentation frameworks (Pin/DynamoRIO), runtime profilers.
+  - Strengths: finds bugs that manifest only at runtime (race conditions, memory corruption).
+  - Weaknesses: requires workloads / inputs to exercise code paths; may miss rare paths.
+- Sandbox mention
+
+  - Sandboxing complements dynamic analysis: run untrusted code in an isolated environment (VM, container, or instrumented sandbox) to observe behavior safely, gather traces, and run automated dynamic tests like fuzzing without risking host compromise.
+
+## Sandbox 
+
+A sandbox is an isolated execution environment that restricts a program’s access to system resources (files, network, devices, other processes) to limit potential damage from buggy or malicious code.
+
+### Implementation
+
+- Techniques:
+  - Process isolation: run code with constrained privileges (chroot, seccomp, capability drops, Windows Job Objects).
+  - Split-process / internal-external architecture: separate sensitive operations into a small, privileged “core” process and run untrusted or high-risk logic in a less-privileged external process. Example: some VMs and language runtimes (and the user-mentioned PyPy approach) use out-of-process sandboxes for JIT'd code or foreign code execution.
+  - Virtualization: full VMs isolate at the hardware/virtual hardware level — strong isolation but heavier weight.
+  - Containers: lighter-weight isolation using kernel namespaces and cgroups; good for process isolation but share a kernel with the host (so kernel vulnerabilities matter).
+  - Language runtime sandboxes: restricted interpreters that block specific syscalls or APIs.
+- Use-cases:
+  - Running browser tabs, plugin code, PDF rendering, online code judge systems, malware analysis labs.
+- Tradeoffs:
+  - Security vs. convenience: stricter sandboxes reduce functionality. Containers are easier to deploy; VMs provide stronger isolation.
+
+## Control Flow Integrity (CFI) 
+
+Control Flow Integrity enforces that a program’s runtime control-flow (which functions can call which other functions, and which return addresses are valid) follows a precomputed legitimate graph so that memory corruption can’t divert execution to arbitrary locations.
+
+### Implementation
+
+- Variants:
+
+  - Coarse-grained CFI: ensure indirect branches only go to a restricted set of possible targets—lighter weight but less strict.
+  - Fine-grained CFI: more precise target sets (per-callsite), stronger but more overhead.
+- Shadow stack:
+
+  - A common CFI technique to protect returns: maintain a separate, protected stack of return addresses (the *shadow stack*) that cannot be corrupted by normal buffer-overflow writes. On function return, the runtime compares the actual return address with shadow stack entry; mismatch indicates an attack.
+  - Implementation requires compiler support and runtime kernel features to protect the shadow stack memory (e.g., make it non-writable to normal code).
+- Deployment:
+
+  - Many modern compilers (clang, gcc) provide CFI options; OSes may also implement kernel-level support (e.g., Intel CET for shadow stack support).
+
+## Code Obfuscation 
+
+Code obfuscation is transforming source or binary code to make it harder to analyze and understand while preserving functionality; primarily used to raise the difficulty/cost of reverse engineering.
+
+### Implementation
+
+- Techniques:
+
+  - Identifier renaming, control-flow flattening, opaque predicates, junk instructions, string encryption, virtualization/translation (translate bytecode into a custom VM).
+  - Binary-level obfuscation: packers, anti-debugging tricks, API-hiding.
+- Use-cases:
+
+  - Protecting IP, licensing checks, deterring casual reverse engineering.
+- Drawbacks:
+
+  - Not a replacement for strong security; determined attackers can deobfuscate. Obfuscation increases maintenance complexity and can introduce bugs or performance penalties.
+
+## Vulnerability Indexes 
+
+Vulnerability indexes are structured systems (scores and taxonomies) used to categorize, prioritize, and compare vulnerabilities across software and time. They help in risk triage and remediation planning.
+
+### Implementation
+
+- Why they exist: to provide a common language for severity, exploitability, and impact so organizations can prioritize fixes and measure progress.
+- Examples and components:
+
+  - CVSS (Common Vulnerability Scoring System): numeric score (0–10) that encodes attack vector, complexity, privileges required, user interaction, impact on confidentiality/integrity/availability, and temporal/environmental modifiers.
+  - CWE (Common Weakness Enumeration): taxonomy of types of software weaknesses (e.g., CWE-79 Cross-site Scripting, CWE-119 Buffer Overflow). Helps classify root cause and improve secure practices.
+- Implementation in processes:
+
+  - Ingest CVE reports, map to CWE categories, use CVSS to set SLAs (e.g., fix CVSS ≥ 7 within X days), and maintain dashboards.
+
+## Non-Executable Stack and Heap 
+
+A non-executable (NX) stack/heap marks memory regions used for data (like stack or heap) as non-executable, preventing code injected into those regions from being executed directly.
+
+### Implementation
+
+- Mechanism:
+
+  - The hardware-supported NX bit (or XD on Intel) marks memory pages as non-executable. The OS enforces this mapping via page table permissions.
+- Effect:
+
+  - Stops simple code-injection attacks where shellcode is placed on the stack/heap and then jumped to.
+  - Attackers adapt with return-oriented programming (ROP) and other code-reuse techniques, so NX is necessary but not sufficient.
+- How to enable:
+
+  - Most modern OSes enable DEP/NX by default. Binaries can be linked with appropriate flags that make data pages non-executable.
+
+## SafeSEH 
+
+SafeSEH (Safe Structured Exception Handling) is a Windows-specific mitigation that restricts exception handler addresses to a validated list in the binary’s load-time table, preventing an attacker from using arbitrary exception handlers to gain control.
+
+### Implementation
+
+- Mechanism:
+
+  - Windows PE executables can include a table of valid exception handlers. When an exception occurs, the OS checks that any handler used is in the table; if not, the handler is rejected.
+- Notes:
+
+  - SafeSEH historically applied to 32-bit Windows PE files and required cooperation at link-time. Newer mitigations and 64-bit Windows have different exception handling models and protections.
+- Tradeoffs:
+
+  - Helps block certain exploit primitives but must be used with other mitigations (ASLR, DEP, CFI).
+
+## Function Pointer Obfuscation 
+
+Function pointer obfuscation hides or mangles function pointers at runtime so that an attacker who obtains memory cannot easily determine or overwrite the true target functions.
+
+### Implementation
+
+- Techniques:
+
+  - XOR/encrypt function pointers when stored in memory and decrypt them on use.
+  - Add per-process/per-instance randomization keys (pointer encoding).
+  - Use indirection tables with integrity checks (hash-based validation).
+- Tradeoffs:
+
+  - Raises bar for attackers but must be done correctly (key management, protection of decoding routine).
+  - Can be combined with CFI and hardware-assisted pointer authentication (e.g., ARM PAC or Intel MPX-like approaches) for stronger guarantees.
+
+## Trusted Platform Module (TPM) 
+
+A Trusted Platform Module (TPM) is a hardware security module (a discrete chip or firmware module) that provides secure cryptographic functions and protected storage for keys, measurements, and attestation — designed to resist software-based attacks.
+
+### Implementation
+
+- Capabilities / APIs:
+
+  - Random number generation: hardware entropy sources for cryptographic randomness.
+  - Key generation & storage: create asymmetric keys inside the TPM and keep private keys non-exportable.
+  - Digital signatures & encryption: TPM can sign or decrypt using keys that never leave the module.
+  - Sealing: bind secrets to platform state (PCRs) so keys or secrets can only be unsealed when the system is in a known good state.
+  - Attestation: provide cryptographic proof of boot/measured state (used in secure boot, remote attestation).
+- Protection against side channels:
+
+  - The TPM’s isolation reduces the risk that private keys are trivially read by software; however, TPMs can still be subject to sophisticated physical side-channel analysis (power, EM) if an attacker has physical access. TPMs reduce the attack surface for software-based side channels by not exporting sensitive key material.
+- Practical uses:
+
+  - Disk encryption key storage (e.g., BitLocker), secure boot chains, attestation for cloud VMs, measured launch of sensitive workloads.
+- Security guarantee:
+
+  - The promise is that private keys and certain operations happen inside a hardened module — the module enforces that sensitive material never leaves it in the clear.
+
+## Notes
+
+- Defensive layering is crucial: ASLR + NX + CFI + sandboxing + secure build flags + auditing reduces the probability of successful exploitation.
+- Testing: use static/dynamic analysis and sandboxed fuzzing to validate mitigations. Try controlled disabling (e.g., ASLR off) in test environments to reproduce exploits for hardening.
+- Risk-based prioritization: vulnerability indexes (CVSS/CWE) help decide which mitigations and patches to deploy first.
 
 ---
 
@@ -1095,12 +1349,10 @@ print(value)
 ## Symmetric
 
 * Shared key between sender and receiver.
-* Algorithms: **AES**, **ChaCha20**
-* Exchange key via **Diffie-Hellman**.
+* Algorithms: AES, ChaCha20
+* Exchange key via Diffie-Hellman.
 
 ## Asymmetric
 
-* **Public key** for encryption, **private key** for decryption.
-* Used in **TLS/SSL** for key exchange and identity verification.
-
----
+* Public key for encryption, private key for decryption.
+* Used in TLS/SSL for key exchange and identity verification.
