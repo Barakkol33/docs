@@ -1346,13 +1346,74 @@ A Trusted Platform Module (TPM) is a hardware security module (a discrete chip o
 
 # Encryption
 
-## Symmetric
+The process of transforming readable data (*plaintext*) into an unreadable format (*ciphertext*) using a mathematical algorithm and one or more keys.
+Its purpose is to protect the confidentiality and integrity of information — ensuring that only authorized parties can access or understand it.
 
-* Shared key between sender and receiver.
-* Algorithms: AES, ChaCha20
-* Exchange key via Diffie-Hellman.
+Encryption is broadly divided into two categories: Symmetric and Asymmetric encryption.
 
-## Asymmetric
+## Symmetric Encryption
 
-* Public key for encryption, private key for decryption.
-* Used in TLS/SSL for key exchange and identity verification.
+### Definition
+
+The same key is used for both encryption and decryption.
+This means the sender and receiver must both possess the shared secret key beforehand.
+
+### Characteristics
+
+* High performance: Fast and efficient, suitable for large amounts of data.
+* Challenge: Securely distributing and managing the shared key.
+* Best for: Encrypting bulk data, files, or network traffic once keys are established.
+
+### Common Algorithms
+
+| Algorithm                              | Description                                                                                                                                    |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| AES (Advanced Encryption Standard) | The most widely used symmetric cipher. Supports 128-, 192-, and 256-bit keys. Strong and efficient.                                            |
+| ChaCha20                           | A stream cipher designed as an alternative to AES. Fast, secure, and resistant to side-channel attacks. Common in mobile and embedded devices. |
+| 3DES (Triple DES)                  | Older standard, less secure today. Superseded by AES.                                                                                          |
+
+### Key Exchange
+
+Since symmetric encryption requires both parties to share a secret key, a secure key exchange mechanism is needed.
+
+Examples:
+1. Diffie–Hellman (DH) - parties exchange keys, no other mechanism is required.
+2. Using asymetric key - party A creates a symmetric key, sends it encrypted it using public key of party B.  
+
+## Asymmetric Encryption
+
+### Definition
+
+Asymmetric encryption uses a key pair:
+
+* A public key (used to encrypt or verify)
+* A private key (used to decrypt or sign)
+
+The keys are mathematically related, but the private key cannot be derived from the public key.
+
+Example algorithm - RSA.
+
+### Characteristics
+
+* Public key can be shared openly — private key must be kept secret.
+* Slower than symmetric encryption due to heavy math operations.
+* Often used to exchange symmetric keys or verify digital signatures, not encrypt large files directly.
+
+### Applications
+
+1. TLS/SSL (HTTPS) –
+   Used during the handshake to:
+
+   * Authenticate the server using a certificate.
+   * Exchange a symmetric session key securely.
+   * Optionally authenticate the client.
+
+2. Digital Signatures –
+   The sender signs a message with their private key, and anyone can verify it using the public key.
+
+### How TLS Uses Both
+
+TLS (used by HTTPS) combines both encryption types:
+
+1. Uses asymmetric encryption (RSA or ECDH) for key exchange and authentication.
+2. Then switches to symmetric encryption (AES or ChaCha20) for data transfer, since it’s faster.
