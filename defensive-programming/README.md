@@ -1,77 +1,46 @@
 # Defensive Programming
 
-## Introduction
-
-Defensive programming is a methodology aimed at building resilient and predictable code.
+A methodology aimed at building resilient and predictable code.
 
 In distributed systems and client-server architectures, errors can occur due to latency, partial failures, and unexpected data — defensive techniques ensure that the system remains correct and recoverable.
 
----
+# System Design
 
-# Programming Concepts
+## Programming Concepts
 
-* Correctness: Code should meet its specifications under all valid inputs.
-* Complexity: Keep algorithms efficient and the codebase simple.
-* Flexibility: Write modular, reusable components that can evolve.
-* Use Cases: Define concrete user stories to clarify expected behavior.
+- Correctness: Code should meet its specifications under all valid inputs.
+- Complexity: Keep algorithms efficient and simple.
+- Flexibility: Write modular, reusable components that can evolve.
+- Use Cases: Define concrete user stories to clarify expected behavior.
 
 ## User Stories
 
 Use cases and user stories describe *what the user wants to do* and *why*, helping designers and developers understand functional requirements and user behavior.
 
-### Examples
+## UML (Unified Modeling Language)
 
-#### General
+Standardized visual language used to model, design, and document software systems.
 
-1. *As a shopper, I want to save items to a wishlist so that I can buy them later.*
-2. *As a new user, I want to sign up with Google so that I don’t have to create a new password.*
-3. *As a team manager, I want to export my team’s activity data so that I can analyze performance offline.*
+Has multiple relationship types.
 
-#### Detailed
+### 1. Association (→)
 
-1. Name: “Add item to cart”  
-   Actor: Shopper  
-   Precondition: User is logged in and viewing a product.  
-   Flow:
-   1. User clicks “Add to Cart.”
-   2. System adds the item to the active shopping cart.
-   3. System updates the cart icon count and shows confirmation.
-      Alternate Flow: If item is out of stock, system displays an error message.
+- Meaning: A general relationship where one class uses or knows another.
+- Multiplicity: 1-to-1, 1-to-many, or many-to-many.
+- Example: `User` 0..* →  1 `Account` (“A user has one or more accounts.”)
 
-2. Name: “Reset Password”  
-   Actor: Registered user  
-   Flow:  
-   1. User clicks “Forgot Password.”
-   2. System prompts for email.
-   3. User receives a reset link and sets a new password.
+### 2. Inheritance (⇑)
 
-### Security Prespective
-* Abuse/misuse cases (for identifying and mitigating attacks)
+- Meaning: A subclass inherits attributes and methods from a parent class.
+- Example: `Admin` -> (arrow with dark head) `User` (“Admin is a specialized kind of User.”)
 
-#### Example
+### 3. Implementation (– – – >)
 
-Attacker tries to brute-force login credentials.
+- Meaning: A class implements the behavior defined by an interface.
+- Example: `AuthService` – – – > `IAuthenticable`
 
-- Threat: Repeated failed login attempts.
--  Mitigation: Implement rate limiting and temporary account lockout.
 
----
-
-# Object-Oriented Programming (OOP)
-
-### Core Concepts
-
-* Class: Blueprint for objects.
-* Object: Instance of a class.
-* Encapsulation: Hide internal state behind public methods.
-* Inheritance: Reuse and extend base functionality.
-* Polymorphism: Common interface, different implementations.
-
-### UML
-
-Used to visualize class structure and relationships.
-
-### Data Flow Diagram
+## Data Flow Diagram
 
 Visual representation of how data moves through a system.
 It shows where data comes from, where it goes, and how it’s transformed.
@@ -80,12 +49,100 @@ It shows where data comes from, where it goes, and how it’s transformed.
 [User] --> (Login Process) --> [Database]
 ```
 
+## Example
+
+### User Stories
+
+1. “As a user, I can register and log in to access my profile.”
+2. “As an admin, I can view and manage users.”
+3. “The system stores users and login data securely.”
+
+### Identified Classes
+
+| Class           | Responsibility                                     |
+| --------------- | -------------------------------------------------- |
+| User        | Stores user information like username and password |
+| Admin       | Inherits from User, adds admin-specific privileges |
+| Account     | Represents user’s profile or data                  |
+| AuthService | Handles registration and login logic               |
+| Database    | Stores Users and Accounts                          |
+
+### Relationships
+
+- `Admin` inherits from `User`
+- `User` has an `Account` (association)
+- `AuthService` uses `Database` (dependency)
+- `Database` stores many `Users`
+- `AuthService` authenticates a `User`
+
+```plaintext
+             +-------------------+
+             |     User          |
+             +-------------------+
+             | - username        |
+             | - passwordHash    |
+             +-------------------+
+             | + login()         |
+             | + logout()        |
+             +-------------------+
+                     ▲
+                     │ Inherits
+                     │
+             +-------------------+
+             |     Admin         |
+             +-------------------+
+             | + manageUsers()   |
+             +-------------------+
+
+             +-------------------+
+             |     Account       |
+             +-------------------+
+             | - id              |
+             | - data            |
+             +-------------------+
+
+User 1 ──── 1 Account
+(User has one Account)
+
+             +-------------------+
+             |   AuthService     |
+             +-------------------+
+             | + registerUser()  |
+             | + loginUser()     |
+             +-------------------+
+                     │
+             Dependency ──→ Database
+
+             +-------------------+
+             |     Database      |
+             +-------------------+
+             | + saveUser()      |
+             | + getUser()       |
+             +-------------------+
+```
+
+---
+
+# Object-Oriented Programming (OOP)
+
+A programming model where software is organized around data, or "objects," rather than functions and logic.
+
+After we design the general structure of a system we delve into each object / entity and the services it supplies for other entities.
+
+### Core Concepts
+
+- Class: Blueprint for objects.
+- Object: Instance of a class.
+- Encapsulation: Hide internal state behind public methods.
+- Inheritance: Reuse and extend base functionality.
+- Polymorphism: Common interface, different implementations.
+
 ### Code Example
 
-* Abstract base class `Shape`.
-* Derived `Circle` overriding `area()`.
-* Use of virtual destructor.
-* Polymorphism through base pointer.
+- Abstract base class `Shape`.
+- Derived `Circle` overriding `area()`.
+- Use of virtual destructor.
+- Polymorphism through base pointer.
 
 ```cpp
 class Shape {
@@ -187,8 +244,8 @@ When a Cpp program runs, memory is divided into regions:
 
 ### Growth Direction
 
-* Stack grows downward (toward lower memory addresses).
-* Heap grows upward (toward higher addresses).
+- Stack grows downward (toward lower memory addresses).
+- Heap grows upward (toward higher addresses).
   They expand toward each other — a full memory collision = stack/heap overflow.
 
 ```
@@ -436,10 +493,10 @@ A vtable (virtual table) is a hidden mechanism that Cpp uses to implement runtim
 
 When a class has at least one `virtual` function:
 
-* The compiler generates a vtable — a table of function pointers.
-* Each object of that class stores a hidden pointer (`vptr`) to its class’s vtable.
-* At runtime, the correct function is called through that table, based on the actual type of the object (not the pointer type).
-* The vtable is essentially an array of pointers to functions and is located at offset 0 of the object's memory.
+- The compiler generates a vtable — a table of function pointers.
+- Each object of that class stores a hidden pointer (`vptr`) to its class’s vtable.
+- At runtime, the correct function is called through that table, based on the actual type of the object (not the pointer type).
+- The vtable is essentially an array of pointers to functions and is located at offset 0 of the object's memory.
 
 ### Example
 
@@ -1069,8 +1126,8 @@ Bug?:
 
 ### Mitigations
 
-* Use constant-time cryptographic operations.
-* Isolate sensitive code (TPM, hardware modules).
+- Use constant-time cryptographic operations.
+- Isolate sensitive code (TPM, hardware modules).
 - use clock to control random number generation
 - get private keys
 
@@ -1086,9 +1143,9 @@ Bug?:
 
 ### Prevention
 
-* Rate limiting.
-* Timeouts and circuit breakers (TODO explain)
-* Create scalable code - does not require more resources if getting a lot of requests (e.g. `select`, reactor pattern).
+- Rate limiting.
+- Timeouts and circuit breakers (TODO explain)
+- Create scalable code - does not require more resources if getting a lot of requests (e.g. `select`, reactor pattern).
 
 ---
 
@@ -1101,9 +1158,9 @@ Bug?: Unsanitized user input.
 
 ### Prevention
 
-* Use parameterized queries (`cursor.execute(query, params)`).
-* Validate input types.
-* Escape strings safely.
+- Use parameterized queries (`cursor.execute(query, params)`).
+- Validate input types.
+- Escape strings safely.
 
 ---
 
@@ -1120,9 +1177,9 @@ Bug?:
 
 Prevention:
 
-* Enable ASLR and DEP.
-* Use safe allocators.
-* Randomize heap structures.
+- Enable ASLR and DEP.
+- Use safe allocators.
+- Randomize heap structures.
 
 ---
 
@@ -1138,9 +1195,9 @@ Bug?:
 
 Prevention:
 
-* Enable ASLR and Control Flow Integrity.
-* Use non-executable stack/heap.
-* Maintain shadow stack integrity.
+- Enable ASLR and Control Flow Integrity.
+- Use non-executable stack/heap.
+- Maintain shadow stack integrity.
 
 ---
 
@@ -1358,21 +1415,15 @@ Encryption is broadly divided into two categories: Symmetric and Asymmetric encr
 The same key is used for both encryption and decryption.
 This means the sender and receiver must both possess the shared secret key beforehand.
 
+Example algorithm - AES.
+
 ### Characteristics
 
-* High performance: Fast and efficient, suitable for large amounts of data.
-* Challenge: Securely distributing and managing the shared key.
-* Best for: Encrypting bulk data, files, or network traffic once keys are established.
+- High performance: Fast and efficient, suitable for large amounts of data.
+- Challenge: Securely distributing and managing the shared key.
+- Best for: Encrypting bulk data, files, or network traffic once keys are established.
 
-### Common Algorithms
-
-| Algorithm                              | Description                                                                                                                                    |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| AES (Advanced Encryption Standard) | The most widely used symmetric cipher. Supports 128-, 192-, and 256-bit keys. Strong and efficient.                                            |
-| ChaCha20                           | A stream cipher designed as an alternative to AES. Fast, secure, and resistant to side-channel attacks. Common in mobile and embedded devices. |
-| 3DES (Triple DES)                  | Older standard, less secure today. Superseded by AES.                                                                                          |
-
-### Key Exchange
+### Key Exchange    
 
 Since symmetric encryption requires both parties to share a secret key, a secure key exchange mechanism is needed.
 
@@ -1386,8 +1437,8 @@ Examples:
 
 Asymmetric encryption uses a key pair:
 
-* A public key (used to encrypt or verify)
-* A private key (used to decrypt or sign)
+- A public key (used to encrypt or verify)
+- A private key (used to decrypt or sign)
 
 The keys are mathematically related, but the private key cannot be derived from the public key.
 
@@ -1395,9 +1446,9 @@ Example algorithm - RSA.
 
 ### Characteristics
 
-* Public key can be shared openly — private key must be kept secret.
-* Slower than symmetric encryption due to heavy math operations.
-* Often used to exchange symmetric keys or verify digital signatures, not encrypt large files directly.
+- Public key can be shared openly — private key must be kept secret.
+- Slower than symmetric encryption due to heavy math operations.
+- Often used to exchange symmetric keys or verify digital signatures, not encrypt large files directly.
 
 ### Applications
 
