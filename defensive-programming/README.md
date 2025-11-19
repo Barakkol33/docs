@@ -11,6 +11,8 @@ In distributed systems and client-server architectures, errors can occur due to 
 - Correctness: Code should meet its specifications under all valid inputs.
 - Complexity: Keep algorithms efficient and simple.
 - Flexibility: Write modular, reusable components that can evolve.
+    - Weak Coupling: Modules should have minimal dependencies on each other, meaning one module knows as little as possible about the implementation details of others. Achieved by relying on interfaces instead of concrete classes. (צמידות)
+    - Strong Cohesion: Elements within a module (like a class or function) are tightly related, logically connected, and focused on a single, well-defined purpose. (לכידות)
 - Use Cases: Define concrete user stories to clarify expected behavior.
 
 ## User Stories
@@ -70,8 +72,8 @@ It shows where data comes from, where it goes, and how it’s transformed.
 ### Relationships
 
 - `Admin` inherits from `User`
-- `User` has an `Account` (association)
-- `AuthService` uses `Database` (dependency)
+- `User` has an `Account`
+- `AuthService` uses `Database` 
 - `Database` stores many `Users`
 - `AuthService` authenticates a `User`
 
@@ -139,6 +141,7 @@ After we design the general structure of a system we delve into each object / en
 
 ### Code Example
 
+- Scopes: Public (`+`), Private (`-`) and Protected (`#`).
 - Abstract base class `Shape`.
 - Derived `Circle` overriding `area()`.
 - Use of virtual destructor.
@@ -246,7 +249,7 @@ When a Cpp program runs, memory is divided into regions:
 
 - Stack grows downward (toward lower memory addresses).
 - Heap grows upward (toward higher addresses).
-  They expand toward each other — a full memory collision = stack/heap overflow.
+  They expand toward each other. Memory collision = stack/heap overflow.
 
 ```
 | high addresses |
@@ -370,7 +373,7 @@ int main() {
 ## Classes 
 - `const` function - means that object properties cannot be changed.
   `const` reference to object - only `const` functions can be used.
-- Use public inheritence because then your users can use the public members of the moether class.
+- Use public inheritence because then your users can use the public members of the mother class.
 
 ```cpp
 #include <iostream>
@@ -431,7 +434,7 @@ public:
     // Virtual destructor
     ~Buffer() override { delete[] data; }
 
-    // Overloaded method: one prints, one with prefix
+    // Method overloading
     void print() const override { std::cout << data << std::endl; }
     void print(const std::string& prefix) const { std::cout << prefix << data << std::endl; }
 
@@ -1094,24 +1097,27 @@ TODO: useful statements
 - Privacy - *Privacy* is about protecting personal or sensitive information from being disclosed without consent.
 - Run-Time Environment - A *runtime environment* is the context in which a program executes — including the system libraries, memory layout, permissions, and interpreter or virtual machine.
 - Sandbox - A *sandbox* is an isolated environment for running code safely, so it can’t affect the rest of the system.
-
-TODO: threat tree
+- Threat tree - summary of known attack paths (similar to user stories) and mitigations for them.
+- Component threats - derived from individual components. 
+  System threats - derived from the host environment or the design / connection of components to one another (DoS, Side channel, )
+- System mitigations - general security best practices and ideas (anti-viruses, sandbox...)
+  Specific mitigations - protect against specific scenarios and attacks.
 
 ## Buffer Overflow
 
 Writing past array bounds.
 
-Bug? 
+Is bug: Yes 
 
 ### Examples
 - When logining in and entering a username, write a long answer so that the password field will be overriden.
 - Writing into the vtable of an object so we the actual called function will be differnet
-- stack cannary
 
 ### Mitigations
 
 - Use `strncpy`, `memcpy_s` in C/Cpp.
-- Enable stack canaries and ASLR.
+- Enable stack canaries - puts information before and after function stack - recognizes if it was overriden. 
+- Enable ASLR - puts functions and objects in different locations in memory each run.
 - Use safe containers like `std::string`.
 
 ---
@@ -1120,16 +1126,17 @@ Bug?
 
 Leaking info via timing or power analysis.
 
-Bug?: 
+Is bug: No
 
 ### Examples
+
+- Use clock to control random number generation
 
 ### Mitigations
 
 - Use constant-time cryptographic operations.
 - Isolate sensitive code (TPM, hardware modules).
-- use clock to control random number generation
-- get private keys
+- Get private keys
 
 ---
 
@@ -1137,24 +1144,41 @@ Bug?:
 
 Flooding server with requests.
 
-Bug?:
-
-### Examples
+Is bug: No, but some implemenations are more vulnerable than others.
 
 ### Prevention
 
 - Rate limiting.
-- Timeouts and circuit breakers (TODO explain)
+- Circuit breakers - if flooded with requests, do not pass some of them on so the system will not overflow.
 - Create scalable code - does not require more resources if getting a lot of requests (e.g. `select`, reactor pattern).
+
+---
+
+## Remote Code Execution (RCE)
+
+Unsafely executing user-supplied code.
+
+Is bug: Yes
+
+### Examples
+
+code injection
+
+### Prevention
+
+- limit code execution scope - exec(code, globals(), locals())
+- Never use `eval` or `exec` on untrusted data.
+- Disable imports: `exec(code, {'__builtins__': None}, {})`.
+    - Trying to bypass import limit - (2,3).__class__.__base__.__subclasses__()
+- Use sandboxing or virtual machines.
 
 ---
 
 ## SQL Injection
 
+Run SQL queries using by providing crafted user input.
 
-Bug?: Unsanitized user input.
-
-### Examples
+Is bug: Yes
 
 ### Prevention
 
@@ -1166,11 +1190,9 @@ Bug?: Unsanitized user input.
 
 ## Heap Spraying
 
-Filling heap with attacker-controlled data to predict memory layout.
+An attacker manipulates an application to allocate many objects containing malicious code in the heap, increasing the success rate of an exploit that jumps to a location within the heap
 
-Bug?: 
-
-### Examples
+Is bug: No
 
 ### Prevention
 
@@ -1187,7 +1209,7 @@ Prevention:
 
 Reusing existing code (gadgets) for malicious execution.
 
-Bug?: 
+Is bug: No
 
 ### Examples
 
@@ -1199,25 +1221,11 @@ Prevention:
 - Use non-executable stack/heap.
 - Maintain shadow stack integrity.
 
----
-
-## Remote Code Execution (RCE)
-
-Unsafely executing user-supplied code.
-
-### Examples
-
-code injection
-
-### Prevention
-
-- limit code execution scope - exec(code, globals(), locals())
-- Never use `eval` or `exec` on untrusted data.
-- Disable imports: `exec(code, {'__builtins__': None}, {})`.
-    - Trying to bypass import limit - (2,3).__class__.__base__.__subclasses__()
-- Use sandboxing or virtual machines.
-
-Bug?: 
+TODO: Man in the middle attack
+TODO: brute force attack
+- If a system gives feedback on correct/incorrect input, then the user can try many combinations until he succeeds.
+- mitigations: create many possible combinations or delay between attempts.
+TODO: types of attacks
 
 ---
 
@@ -1241,18 +1249,13 @@ Dynamic analysis inspects program behavior at runtime (fuzzing, instrumentation,
 ### Implementation
 
 - Static analysis
-
   - Tools: linters, type checkers, static analyzers, binary scanners.
   - Strengths: early detection, broad code coverage, no need to run untrusted code.
   - Weaknesses: false positives, limited visibility into runtime behavior and environment-specific bugs.
 - Dynamic analysis
-
   - Tools: fuzzers, sanitizers (ASAN, UBSAN), debuggers, instrumentation frameworks (Pin/DynamoRIO), runtime profilers.
   - Strengths: finds bugs that manifest only at runtime (race conditions, memory corruption).
   - Weaknesses: requires workloads / inputs to exercise code paths; may miss rare paths.
-- Sandbox mention
-
-  - Sandboxing complements dynamic analysis: run untrusted code in an isolated environment (VM, container, or instrumented sandbox) to observe behavior safely, gather traces, and run automated dynamic tests like fuzzing without risking host compromise.
 
 ## Sandbox 
 
@@ -1277,16 +1280,10 @@ Control Flow Integrity enforces that a program’s runtime control-flow (which f
 
 ### Implementation
 
-- Variants:
-
-  - Coarse-grained CFI: ensure indirect branches only go to a restricted set of possible targets—lighter weight but less strict.
-  - Fine-grained CFI: more precise target sets (per-callsite), stronger but more overhead.
 - Shadow stack:
-
   - A common CFI technique to protect returns: maintain a separate, protected stack of return addresses (the *shadow stack*) that cannot be corrupted by normal buffer-overflow writes. On function return, the runtime compares the actual return address with shadow stack entry; mismatch indicates an attack.
   - Implementation requires compiler support and runtime kernel features to protect the shadow stack memory (e.g., make it non-writable to normal code).
 - Deployment:
-
   - Many modern compilers (clang, gcc) provide CFI options; OSes may also implement kernel-level support (e.g., Intel CET for shadow stack support).
 
 ## Code Obfuscation 
@@ -1296,30 +1293,23 @@ Code obfuscation is transforming source or binary code to make it harder to anal
 ### Implementation
 
 - Techniques:
-
   - Identifier renaming, control-flow flattening, opaque predicates, junk instructions, string encryption, virtualization/translation (translate bytecode into a custom VM).
   - Binary-level obfuscation: packers, anti-debugging tricks, API-hiding.
 - Use-cases:
-
   - Protecting IP, licensing checks, deterring casual reverse engineering.
 - Drawbacks:
-
   - Not a replacement for strong security; determined attackers can deobfuscate. Obfuscation increases maintenance complexity and can introduce bugs or performance penalties.
 
 ## Vulnerability Indexes 
 
-Vulnerability indexes are structured systems (scores and taxonomies) used to categorize, prioritize, and compare vulnerabilities across software and time. They help in risk triage and remediation planning.
+Vulnerability indexes are structured systems used to categorize, prioritize, and compare vulnerabilities across software and time. They help in risk triage and remediation planning.
 
 ### Implementation
 
 - Why they exist: to provide a common language for severity, exploitability, and impact so organizations can prioritize fixes and measure progress.
 - Examples and components:
-
   - CVSS (Common Vulnerability Scoring System): numeric score (0–10) that encodes attack vector, complexity, privileges required, user interaction, impact on confidentiality/integrity/availability, and temporal/environmental modifiers.
   - CWE (Common Weakness Enumeration): taxonomy of types of software weaknesses (e.g., CWE-79 Cross-site Scripting, CWE-119 Buffer Overflow). Helps classify root cause and improve secure practices.
-- Implementation in processes:
-
-  - Ingest CVE reports, map to CWE categories, use CVSS to set SLAs (e.g., fix CVSS ≥ 7 within X days), and maintain dashboards.
 
 ## Non-Executable Stack and Heap 
 
@@ -1328,15 +1318,10 @@ A non-executable (NX) stack/heap marks memory regions used for data (like stack 
 ### Implementation
 
 - Mechanism:
-
   - The hardware-supported NX bit (or XD on Intel) marks memory pages as non-executable. The OS enforces this mapping via page table permissions.
 - Effect:
-
   - Stops simple code-injection attacks where shellcode is placed on the stack/heap and then jumped to.
   - Attackers adapt with return-oriented programming (ROP) and other code-reuse techniques, so NX is necessary but not sufficient.
-- How to enable:
-
-  - Most modern OSes enable DEP/NX by default. Binaries can be linked with appropriate flags that make data pages non-executable.
 
 ## SafeSEH 
 
@@ -1345,13 +1330,10 @@ SafeSEH (Safe Structured Exception Handling) is a Windows-specific mitigation th
 ### Implementation
 
 - Mechanism:
-
   - Windows PE executables can include a table of valid exception handlers. When an exception occurs, the OS checks that any handler used is in the table; if not, the handler is rejected.
 - Notes:
-
   - SafeSEH historically applied to 32-bit Windows PE files and required cooperation at link-time. Newer mitigations and 64-bit Windows have different exception handling models and protections.
 - Tradeoffs:
-
   - Helps block certain exploit primitives but must be used with other mitigations (ASLR, DEP, CFI).
 
 ## Function Pointer Obfuscation 
@@ -1361,12 +1343,10 @@ Function pointer obfuscation hides or mangles function pointers at runtime so th
 ### Implementation
 
 - Techniques:
-
   - XOR/encrypt function pointers when stored in memory and decrypt them on use.
   - Add per-process/per-instance randomization keys (pointer encoding).
   - Use indirection tables with integrity checks (hash-based validation).
 - Tradeoffs:
-
   - Raises bar for attackers but must be done correctly (key management, protection of decoding routine).
   - Can be combined with CFI and hardware-assisted pointer authentication (e.g., ARM PAC or Intel MPX-like approaches) for stronger guarantees.
 
@@ -1377,20 +1357,15 @@ A Trusted Platform Module (TPM) is a hardware security module (a discrete chip o
 ### Implementation
 
 - Capabilities / APIs:
-
   - Random number generation: hardware entropy sources for cryptographic randomness.
   - Key generation & storage: create asymmetric keys inside the TPM and keep private keys non-exportable.
   - Digital signatures & encryption: TPM can sign or decrypt using keys that never leave the module.
   - Sealing: bind secrets to platform state (PCRs) so keys or secrets can only be unsealed when the system is in a known good state.
-  - Attestation: provide cryptographic proof of boot/measured state (used in secure boot, remote attestation).
 - Protection against side channels:
-
   - The TPM’s isolation reduces the risk that private keys are trivially read by software; however, TPMs can still be subject to sophisticated physical side-channel analysis (power, EM) if an attacker has physical access. TPMs reduce the attack surface for software-based side channels by not exporting sensitive key material.
 - Practical uses:
-
   - Disk encryption key storage (e.g., BitLocker), secure boot chains, attestation for cloud VMs, measured launch of sensitive workloads.
 - Security guarantee:
-
   - The promise is that private keys and certain operations happen inside a hardened module — the module enforces that sensitive material never leaves it in the clear.
 
 ## Notes
