@@ -551,7 +551,7 @@ int main() {
 
 Output: `Derived speaks`
 
-If there were no `virtual`, it would instead call `Base::speak()` (static binding).
+If there were no `virtual` functions, it would instead call `Base::speak()` (static binding).
 So the vtable enables dynamic dispatch.
 
 In memory, the 4 bytes at `*obj` are the pointer to `Derived::speak()`.
