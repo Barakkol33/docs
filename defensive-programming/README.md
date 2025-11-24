@@ -1236,6 +1236,70 @@ Is bug: Yes
 - Enable ASLR - puts functions and objects in different locations in memory each run.
 - Use safe containers like `std::string`.
 
+
+## Man-in-the-Middle (MITM)
+
+An attacker secretly interposes between two parties and reads/changes traffic while making each side believe they’re talking directly to the other.
+
+### Examples
+
+- Rogue Wi-Fi / Evil Twin: Attacker creates a hotspot named like a real one; victims connect and all traffic is proxied/sniffed.
+- ARP spoofing (LAN): Poisoning ARP tables so victims send traffic to the attacker’s MAC; attacker forwards to the real gateway.
+- DNS spoofing/hijack: Tamper with DNS answers so victims go to attacker-controlled servers.
+
+### Mitigations
+
+- End-to-end encryption: Always use TLS (HTTPS, SMTPS, IMAPS). Prefer HSTS, TLS 1.2+, strong ciphers.
+- Certificate validation: Pinning (where feasible), distrust unknown CAs, watch for cert warnings; use certificate transparency monitoring.
+- Secure DNS: DoT/DoH to a trusted resolver; DNSSEC validation on resolvers.
+- Wi-Fi: WPA2-Enterprise/WPA3, disable open SSIDs, use per-user creds or EAP-TLS.
+
+## Brute-Force Attacks
+
+Systematic guessing of secrets (passwords, keys, tokens). Variants differ by source of guesses and where they’re applied.
+
+### Examples
+
+- Online brute force (against a live service):
+
+  - Password spraying: Try one common password across many accounts to avoid lockouts.
+  - Credential stuffing: Use leaked email:password combos against other sites.
+
+- Offline cracking (against stolen hashes or encrypted blobs):
+
+  - Dictionary / rule-based / hybrid using GPU rigs on hashes (NTLM, SHA-1, etc.).
+  - Keyspace brute force for short keys/secrets; mask attacks for known patterns.
+
+- API token / short link guessing if identifiers have low entropy.
+
+Why attackers succeed: Weak passwords, password reuse, poor rate limiting, informative error messages (account enumeration), fast/unsalted hashes, no MFA.
+
+### Mitigations
+
+- Strong authentication:
+
+  - Multi Factor Authenticatoin, ideally phishing-resistant.
+  - If passwords remain: enforce length + complexity that resists guessing (passphrases), no reuse, check new passwords against breached lists.
+
+- Rate controls:
+
+  - Progressive delays, per-IP/ASN/app-token rate limiting, SYN/connection limits at edge.
+  - Lockout / step-up after few failures (but protect from trivial DoS by using cooldowns, CAPTCHA, or risk-based auth).
+
+- Detection & response:
+
+  - Credential-stuffing signatures (odd user-agents, high failure rates, replay patterns).
+  - Impossible travel, device fingerprint, IP reputation, velocity rules, alerting.
+
+- Good password storage (for offline risk):
+
+  - Use Argon2id (preferred) or bcrypt/scrypt with strong parameters; unique salt per hash; add pepper at the app tier if suitable.
+
+- Protocol & UX hardening:
+
+  - Generic failure messages (avoid account enumeration).
+  - Enforce HTTPS/HSTS; protect login endpoints with WAF/bot defenses; throttle OTP attempts; bind OTP to device/time window.
+
 ## Side-Channel Attacks
 
 Leaking info via timing or power analysis.
@@ -1431,9 +1495,7 @@ An open relay lets anyone send mail to anywhere via your server → spam, IP/dom
 - Deploy SPF, DKIM, and DMARC to authenticate senders and publish handling policy.
 - Use RBLs, rate limiting, greylisting, and sensible acceptance policies.
 
-## Web Apps - XSS and CSRF
-
-# XSS — Cross-Site Scripting
+## XSS — Cross-Site Scripting
 
 An attacker gets their JavaScript to run in a victim’s browser in the context of your site. That script can read data the page can read (e.g., session-bearing cookies if not `HttpOnly`), make API calls as the user, alter the DOM, etc.
 
@@ -1450,7 +1512,7 @@ An attacker gets their JavaScript to run in a victim’s browser in the context 
 - Input validation (whitelists) to reduce dangerous inputs, but still escape on output.
 - HttpOnly & Secure cookies, avoid reflecting untrusted input into scripts, and prefer same-site navigation patterns.
 
-# CSRF — Cross-Site Request Forgery
+## CSRF — Cross-Site Request Forgery
 
 An attacker tricks a logged-in user’s browser into sending a legitimate-looking request to your site (e.g., “transfer money”) without the user’s intent. The browser automatically includes cookies (session), so the server thinks it’s the user.
 
@@ -1471,69 +1533,6 @@ An attacker page can auto-submit a hidden form to that URL. The victim’s brows
 
 - Integer overflow (MAX_INT -> 0) - can be used to make program allocate create small buffers, so the attacker will perform buffer overflow.
 - Use-After-Free (UAF) - attacker saves a pointer that was once used, makes system allocate another struct in the same area, and then gain access system components. To prevent - NULLify after free.
-
-## Man-in-the-Middle (MITM)
-
-An attacker secretly interposes between two parties and reads/changes traffic while making each side believe they’re talking directly to the other.
-
-### Examples
-
-- Rogue Wi-Fi / Evil Twin: Attacker creates a hotspot named like a real one; victims connect and all traffic is proxied/sniffed.
-- ARP spoofing (LAN): Poisoning ARP tables so victims send traffic to the attacker’s MAC; attacker forwards to the real gateway.
-- DNS spoofing/hijack: Tamper with DNS answers so victims go to attacker-controlled servers.
-
-### Mitigations
-
-- End-to-end encryption: Always use TLS (HTTPS, SMTPS, IMAPS). Prefer HSTS, TLS 1.2+, strong ciphers.
-- Certificate validation: Pinning (where feasible), distrust unknown CAs, watch for cert warnings; use certificate transparency monitoring.
-- Secure DNS: DoT/DoH to a trusted resolver; DNSSEC validation on resolvers.
-- Wi-Fi: WPA2-Enterprise/WPA3, disable open SSIDs, use per-user creds or EAP-TLS.
-
-## Brute-Force Attacks
-
-Systematic guessing of secrets (passwords, keys, tokens). Variants differ by source of guesses and where they’re applied.
-
-### Examples
-
-- Online brute force (against a live service):
-
-  - Password spraying: Try one common password across many accounts to avoid lockouts.
-  - Credential stuffing: Use leaked email:password combos against other sites.
-
-- Offline cracking (against stolen hashes or encrypted blobs):
-
-  - Dictionary / rule-based / hybrid using GPU rigs on hashes (NTLM, SHA-1, etc.).
-  - Keyspace brute force for short keys/secrets; mask attacks for known patterns.
-
-- API token / short link guessing if identifiers have low entropy.
-
-Why attackers succeed: Weak passwords, password reuse, poor rate limiting, informative error messages (account enumeration), fast/unsalted hashes, no MFA.
-
-### Mitigations
-
-- Strong authentication:
-
-  - Multi Factor Authenticatoin, ideally phishing-resistant.
-  - If passwords remain: enforce length + complexity that resists guessing (passphrases), no reuse, check new passwords against breached lists.
-
-- Rate controls:
-
-  - Progressive delays, per-IP/ASN/app-token rate limiting, SYN/connection limits at edge.
-  - Lockout / step-up after few failures (but protect from trivial DoS by using cooldowns, CAPTCHA, or risk-based auth).
-
-- Detection & response:
-
-  - Credential-stuffing signatures (odd user-agents, high failure rates, replay patterns).
-  - Impossible travel, device fingerprint, IP reputation, velocity rules, alerting.
-
-- Good password storage (for offline risk):
-
-  - Use Argon2id (preferred) or bcrypt/scrypt with strong parameters; unique salt per hash; add pepper at the app tier if suitable.
-
-- Protocol & UX hardening:
-
-  - Generic failure messages (avoid account enumeration).
-  - Enforce HTTPS/HSTS; protect login endpoints with WAF/bot defenses; throttle OTP attempts; bind OTP to device/time window.
 
 ---
 
