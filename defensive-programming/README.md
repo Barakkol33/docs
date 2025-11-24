@@ -554,9 +554,9 @@ Output: `Derived speaks`
 If there were no `virtual`, it would instead call `Base::speak()` (static binding).
 So the vtable enables dynamic dispatch.
 
-In memory, the bytes at `*obj` are the pointer to `Derived::speak()`.
+In memory, the 4 bytes at `*obj` are the pointer to `Derived::speak()`.
 
-If there were more function their pointers would be at _(obj + 4), _(obj + 8), etc (assuming 32 bit architecture).
+If there were more functions their pointers would be at `*(obj + 4)`, `*(obj + 8)`, etc (assuming 32 bit architecture).
 
 ## Excptions
 
