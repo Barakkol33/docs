@@ -1,10 +1,7 @@
 # Defensive Programming
 
-A methodology aimed at building resilient and predictable code.
-
-In distributed systems and client-server architectures, errors can occur due to latency,
-partial failures, and unexpected data
-— defensive techniques ensure that the system remains correct and recoverable.
+In distributed systems, errors can occur due to bugs, malicious input and unexpected data. 
+Defensive techniques ensure that the system remains correct and resilient.
 
 # System Design
 
@@ -132,7 +129,7 @@ User 1 ──── 1 Account
 
 # Object-Oriented Programming (OOP)
 
-A programming model where software is organized around data, or "objects," rather than functions and logic.
+A programming model where software is organized around data, or "objects", rather than functions and logic.
 
 After we design the general structure of a system we delve into each object / entity and the services it supplies for other entities.
 
@@ -156,7 +153,8 @@ After we design the general structure of a system we delve into each object / en
 ```cpp
 class Shape {
 public:
-    virtual double area() const = 0; // abstract
+  // Abstract method
+    virtual double area() const = 0; 
     virtual ~Shape() = default;
 };
 
@@ -164,14 +162,15 @@ class Circle : public Shape {
 private:
     double radius;
 public:
-    explicit Circle(double r): radius(r) {}
+    Circle(double r): radius(r) {}
     double area() const override { return 3.1415 * radius * radius; }
 };
 
 int main() {
-    Shape* shape = new Circle(5.0);   // dynamic polymorphism
-    std::cout << "Circle area: " << shape->area() << std::endl;
-    delete shape;                     // clean up
+    // Polymorphism
+    Shape* shape = new Circle(5.0);   
+    std::cout << "Area: " << shape->area() << std::endl;
+    delete shape;                     
     return 0;
 }
 ```
@@ -359,7 +358,7 @@ int main() {
 
 struct Node {
     int value;
-    explicit Node(int v): value(v) {}
+    Node(int v): value(v) {}
 };
 
 int main() {
@@ -399,6 +398,7 @@ int main() {
 - `const` function - means that object properties cannot be changed.
   `const` reference to object - only `const` functions can be used.
 - Use public inheritence because then your users can use the public members of the mother class.
+- Copy ctor and operator= are available by default and perform shallow copy, implictly deleted if any member is non-copyable.
 
 ```cpp
 #include <iostream>
@@ -408,7 +408,7 @@ int main() {
 // ---------------- Base Abstract Class ----------------
 class Printable {
 public:
-    // Abstract (pure virtual)
+    // Abstract method (pure virtual)
     virtual void print() const = 0;
     virtual ~Printable() = default;
 };
@@ -630,15 +630,36 @@ Linux: `char* variable_value = getenv("VARIABLE")`
 int main() {
     // Write to file
     std::ofstream out("example.txt");
+    if (!out.is_open())
+    {
+        throw std::runtime_error(std::string() + "Could not open file");
+    }
+
+    std::string content = "...";
+    out.write(content.c_str(), content.size());
+
     out << "Hello, file!" << std::endl;
     out.close();
 
     // Read from file
     std::ifstream in("example.txt");
+    if (!in.is_open())
+    {
+        throw std::runtime_error(std::string() + "Could not open file");
+    }
+
     std::string line;
     while (std::getline(in, line))
         std::cout << line << std::endl;
     in.close();
+
+    int size = 1024;
+    char result[size];
+    out.read(result, size);
+
+    // Open in binary mode.
+    std::ofstream file;
+    file.open(file_path, std::ofstream::out | (binary ? std::ofstream::binary : 0));
 }
 ```
 
@@ -670,7 +691,7 @@ int main() {
 
     // === 3. Access ===
     std::cout << "\nAccess by key:" << std::endl;
-    // at() throws exception if key not found - better than []
+    // at() throws exception if key is not found - better than []
     std::cout << "Tom: " << ages.at("Tom") << std::endl;
 
     // === 4. Iteration ===
@@ -748,9 +769,52 @@ int main() {
 }
 ```
 
+## Diamond Inhertiance Problem & Virtual Inheriance
+
+- Virtual functions (`virtual void f()`): solve _which override to call_ (dynamic dispatch). They do not prevent having two separate base subobjects in a diamond.
+- Virtual inheritance (`struct B : virtual A {}`): makes the most-derived class hold one shared `A` subobject, removing duplication/ambiguity of state.
+
+#### Without virtual inheritance — duplicate `A`
+
+```cpp
+struct A { int x = 0; };
+struct B1 : A {};
+struct B2 : A {};
+struct D : B1, B2 {}; // diamond
+
+D d;
+// d.A::x is ambiguous; there are two A subobjects: via B1 and via B2
+```
+
+#### With virtual inheritance — single `A`
+
+```cpp
+struct A { int x = 0; virtual ~A() = default; };
+struct B1 : virtual A {};
+struct B2 : virtual A {};
+struct D : B1, B2 {
+    D() { x = 42; }  // OK: there's only one A subobject
+};
+```
+
+### Notes
+
+- The most-derived class (`D`) is responsible for constructing the virtual base (`A`) in its constructor initializer list:
+
+  ```cpp
+  struct D : B1, B2 {
+      D() : A{} {}   // initialize the virtual base
+  };
+  ```
+
+- Access may still need qualification if multiple intermediate bases define members with the same name.
+- Virtual functions work orthogonally: if `A::f` is virtual and overridden in `B1/B2/D`, dynamic dispatch chooses the most-derived override, but you still need virtual inheritance to avoid duplicate `A` state.
+
 ---
 
-## Networking — Boost.Asio Example
+## Networking
+
+`htons()` - converts little endian to big endian
 
 ### Server
 
@@ -763,13 +827,14 @@ using boost::asio::ip::tcp;
 
 int main() {
     try {
-        boost::asio::io_context io;
-        tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 12345));
+        unsigned short port = 12345;
+        boost::asio::io_context io_context;
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
 
         std::cout << "Server listening on port 12345...\n";
 
         for (;;) {
-            tcp::socket socket(io);
+            tcp::socket socket(io_context);
             acceptor.accept(socket);
 
             std::cout << "Client connected!\n";
@@ -810,7 +875,7 @@ int main() {
         boost::asio::io_context io_context;
         tcp::socket socket(io_context);
         tcp::resolver resolver(io_context);
-        boost::asio::connect(socket), resolver.resolve(address, port));
+        boost::asio::connect(socket, resolver.resolve(address, port));
         std::cout << "Connected to server.\n";
 
         // Send message
@@ -879,6 +944,13 @@ class Person:
         print(f"[__setattr__] Setting '{key}' = {value}")
         super().__setattr__(key, value)
 
+    def __lt__(self, other):
+        # Called on < usage
+        return self.age < other.age
+
+    # Adding `__` performs changes name but does not really hide.
+    def __pseudo_hidden():
+      pass
 
 # Derived Class
 class Student(Person):
@@ -927,6 +999,7 @@ def main():
     # Strings
     # Constants
     chars = string.ascii_letters + string.digits
+    # `str.split()` - splits by space or newline
 
     # Random choice
     print(random.choice(chars))
@@ -957,15 +1030,33 @@ def main():
     print(f"Object class: {s.__class__}")
     print(f"Object base classes: {s.__class.__.__bases__}")
 
+    print("Monkey patching:")
+    import math
+    original = math.sin
+    math.sin = lambda x: 41
+    print(math.sqrt(30)) # 1
+
+    print("setattr, getattr")
+    class C: pass
+    c = C()
+    setattr(c, 'num', 1)
+    # getatter() will call __getattribute__ on normal access and __getattr__ on special access.
+    print(getattr(c, 'num')) # 1
+
+    print("inspect")
+    import inspect
+    def func(num): return num
+    print(inspect.signature(func)) # (num)
+    print(func.__name__) # 'func'
+
     # Decorating all the methods of an object:
     # @classmethod
     # def class_method(cls):
     #     for attribute, item in cls.__dict__.items():
     #         if callable(item):
     #             setattr(cls,attr,decorator(item))
-
     with open(filename, permissions) as file:
-        file.read(content)
+        content = file.read(1024)
         file.write(content)
 
     # - Default permission is read - "r"
@@ -1117,6 +1208,40 @@ num1, num2 = struct.unpack('<IB', packed)
 print(num1, num2)
 ```
 
+## Descriptors
+
+Python descriptors are objects that customize attribute access on a class.
+If an attribute stored on a class defines any of `__get__`, `__set__`, or `__delete__`, Python routes this attribute access through those methods.
+
+Call logic:
+
+```py
+value = descr.__get__(obj, type(obj))         # on instance access
+value = descr.__get__(None, Cls)              # on class access
+descr.__set__(obj, value)                     # on assignment: obj.attr = value
+descr.__delete__(obj)                         # on del obj.attr
+```
+
+Types:
+
+- **Data descriptor**: defines `__set__` and/or `__delete__`. Takes precedence over instance attributes.
+- **Non-data descriptor**: defines only `__get__`. Instance attributes override it.
+
+Example:
+
+```py
+class UpperCase:
+    def __get__(self, obj, owner):
+        return obj._name.upper()
+
+class Person:
+    name = UpperCase()
+    def __init__(self, name): self._name = name
+
+p = Person("Ada")
+print(p.name)  # "ADA"
+```
+
 ---
 
 # Networking
@@ -1143,20 +1268,79 @@ SQL, or Structured Query Language, is a domain-specific programming language des
 
 SQL is primarily used with RDBMS (Relational Database Management Systems), which store data in a structured, tabular format with rows and columns. Examples include MySQL, Oracle, PostgreSQL, and Microsoft SQL Server.
 
-### Useful Commands
+## Useful Commands
 
-```
+```SQL
 CREATE TABLE Table(column1 datatype, column2 datatype,…);
+CREATE TABLE Users(UserID int NOT NULL PRIMARY KEY, UserName varchar(255), Age int);
 
 INSERT INTO Table VALUES (value1, value2, ...);
+INSERT INTO Users VALUES (123, "Dan", 12);
 
 UPDATE Table SET column1 = value1, column2 = value2, … WHERE condition;
+UPDATE Users SET Age = 12 WHERE UserID = 123;
 
 SELECT column1, column2, … FROM Table WHERE condition;
-
 SELECT * FROM Table WHERE condition;
+SELECT UserID, UserName FROM Users WHERE age >= 12;
 
 DELETE FROM Table WHERE condition;
+DELETE FROM Users WHERE UserID = 123;
+```
+
+## SQL in Python
+
+```python
+import sqlite3
+
+# Connect
+conn = sqlite3.connect('databasename.db')
+
+# Use this to return TEXT as bytes and not str (if storing non-readable strings)
+conn.text_factory = bytes
+
+# Execute without data
+conn.executescript(query)
+
+# Execute with data
+cur = conn.cursor()
+cur.execute(query)
+rows = cur.fetchall()
+
+row = cur.fetchone()
+value1, value2, value3 = row
+
+# Parameterized queries
+cur.execute("QUERY ... VALUES (?, ?, ?);", (value1, value2, value3))
+
+# Save changes
+conn.commit()
+
+# Close
+conn.close()
+```
+
+## SQL in Cpp
+
+```cpp
+#include "sqlite3.h"
+
+...
+
+sqlite3* db = nullptr;
+char *query = nullptr;
+char* error = nullptr;
+int result = 0;
+
+
+int result = sqlite3_open("database.db", &db);
+if (result != SQLITE_OK) { /* error */ }
+
+char* query = "QUERY;";
+result = sqlite3_exec(db, query, nullptr, nullptr, &error);
+if (result != SQLITE_OK) { /* error */ }
+
+sqlite3_close(db);
 ```
 
 ---
@@ -1165,13 +1349,11 @@ DELETE FROM Table WHERE condition;
 
 - Useful design - server can have many resources (compute, storage, etc.) and clients only need to login. They can be used from anywhere.
 - Sometimes we will want the server to run code - then we need to find ways to limit it and prevent attacks.
-- Commands can be split to local and system commands, and make all system commands be handled by an external
-  process. Then the server can choose to deny some commands. `PyPy` uses this.
-- Remote method invocation - instead of letting user run arbitrary code, we will give list of functions
-  that can be executed remotely.
+- Commands can be split to local and system commands, and make all system commands be handled by an external process. Then the server can choose to deny some commands. `PyPy` uses this.
+- Remote method invocation - instead of letting user run arbitrary code, we will give list of functions that can be executed remotely.
   - Then we only need to make sure they are secure.
-  - Efficient implementation - make functions genericly serializable and send them on the network, Create
-    a metaclass that will wrap all methods and send them remotely when called.
+  - Efficient implementation - make functions genericly serializable and send them on the network, Create a metaclass that will wrap all methods and send them remotely when called.
+- See also: `Remote Code Exeuction (RCE)` below.
 
 # Security
 
@@ -1195,64 +1377,22 @@ DELETE FROM Table WHERE condition;
 
 ## Principals
 
-- Minimum principal - give every section minimum permissions.
-- Validation principal - validate length, type, content
+- Minimum principal - give every module minimum permissions.
+- Validation principal - validate length, type, content.
 - Modularity - if one module is compromized, the rest are secure.
-- Continous updates - to close vulnerabilities
-
-## Privilege Escalation
-
-- Users and groups can be given very little permissions to resources by default.
-- An attacker's purpose is to gain more - privilege escalation.
-- Vertical - gain more permissions (i.e admin)
-  Horizontal - gain permissions to other users with same permissions.
+- Continuous updates - to close bugs and vulnerabilities.
+- Layering - using multiple strategies and mitigations reduces the probability of successful exploitation.
 
 ## Attacks
 
 Attack types (arbitrary partition):
 
 - Brute force
+- Privilege Escalation
+- Buffer overflow
+- Man in the middle (MITM)
 - Code Injection
 - Denial of service (DOS)
-- Man in the middle (MITM)
-- Buffer overflow
-
-## Buffer Overflow
-
-Writing past array bounds.
-
-Is bug: Yes
-
-### Examples
-
-- When logining in and entering a username, write a long answer so that the password field will be overriden.
-- Writing into the vtable of an object so we the actual called function will be differnet
-- `scanf()` to a local buffer variable without boundary size is a classic buffer overflow vulnerability - can write return address.
-
-### Mitigations
-
-- Use `strncpy`, `memcpy_s` in C/Cpp.
-- Enable stack canaries - puts a constant between local variables and return address - recognizes if it was overriden.
-- Enable ASLR - puts functions and objects in different locations in memory each run.
-- Use safe containers like `std::string`.
-
-
-## Man-in-the-Middle (MITM)
-
-An attacker secretly interposes between two parties and reads/changes traffic while making each side believe they’re talking directly to the other.
-
-### Examples
-
-- Rogue Wi-Fi / Evil Twin: Attacker creates a hotspot named like a real one; victims connect and all traffic is proxied/sniffed.
-- ARP spoofing (LAN): Poisoning ARP tables so victims send traffic to the attacker’s MAC; attacker forwards to the real gateway.
-- DNS spoofing/hijack: Tamper with DNS answers so victims go to attacker-controlled servers.
-
-### Mitigations
-
-- End-to-end encryption: Always use TLS (HTTPS, SMTPS, IMAPS). Prefer HSTS, TLS 1.2+, strong ciphers.
-- Certificate validation: Pinning (where feasible), distrust unknown CAs, watch for cert warnings; use certificate transparency monitoring.
-- Secure DNS: DoT/DoH to a trusted resolver; DNSSEC validation on resolvers.
-- Wi-Fi: WPA2-Enterprise/WPA3, disable open SSIDs, use per-user creds or EAP-TLS.
 
 ## Brute-Force Attacks
 
@@ -1265,12 +1405,9 @@ Systematic guessing of secrets (passwords, keys, tokens). Variants differ by sou
   - Password spraying: Try one common password across many accounts to avoid lockouts.
   - Credential stuffing: Use leaked email:password combos against other sites.
 
-- Offline cracking (against stolen hashes or encrypted blobs):
+- Offline cracking (against stolen hashes or encrypted blobs) - Dictionary or rule-based to break hashes (NTLM, SHA-1, etc.).
 
-  - Dictionary / rule-based / hybrid using GPU rigs on hashes (NTLM, SHA-1, etc.).
-  - Keyspace brute force for short keys/secrets; mask attacks for known patterns.
-
-- API token / short link guessing if identifiers have low entropy.
+- API token / short link guessing if identifiers have low entropy (small amount of possible options).
 
 Why attackers succeed: Weak passwords, password reuse, poor rate limiting, informative error messages (account enumeration), fast/unsalted hashes, no MFA.
 
@@ -1278,7 +1415,7 @@ Why attackers succeed: Weak passwords, password reuse, poor rate limiting, infor
 
 - Strong authentication:
 
-  - Multi Factor Authenticatoin, ideally phishing-resistant.
+  - Multi Factor Authentication, ideally phishing-resistant.
   - If passwords remain: enforce length + complexity that resists guessing (passphrases), no reuse, check new passwords against breached lists.
 
 - Rate controls:
@@ -1299,23 +1436,77 @@ Why attackers succeed: Weak passwords, password reuse, poor rate limiting, infor
 
   - Generic failure messages (avoid account enumeration).
   - Enforce HTTPS/HSTS; protect login endpoints with WAF/bot defenses; throttle OTP attempts; bind OTP to device/time window.
+  - Don't let the system give feedback on correct/incorrect input. 
+  - Create many possible combinations or delay between attempts.
+
+## Privilege Escalation
+Users and groups can be given very little permissions to resources by default. An attacker's purpose is to gain more - privilege escalation.
+
+Is bug: No
+
+### Examples 
+
+- Hacking into database to get users credentials.
+- Vertical - gain more permissions (i.e admin).
+  Horizontal - gain permissions to other users with same permissions.
+
+### Mitigations
+
+- Least Privilege: Grant users and applications only the minimum permissions necessary.
+- Strong Authentication: Enforce strong password policies and multi-factor authentication.
+
+## Buffer Overflow
+
+Writing past array bounds.
+
+Is bug: Yes
+
+### Examples
+
+- `scanf()` to a local buffer variable without boundary, and then write a different return address on the stack.
+- When entering a username, write a long answer so that the password field will be overriden.
+- Writing into the vtable of an object so the actual called function will be different.
+
+### Mitigations
+
+- Use `strncpy`, `memcpy_s` in C/Cpp or safe containers like `std::string`.
+- Enable stack canaries - puts a constant between local variables and return address - recognizes if it was overriden.
+- Enable ASLR - puts functions and objects in different locations in memory each run.
+
+## Man-in-the-Middle (MITM)
+
+An attacker secretly interposes between two parties and reads/changes traffic while making each side believe they’re talking directly to the other.
+
+### Examples
+
+- Rogue Wi-Fi / Evil Twin: Attacker creates a hotspot named like a real one; victims connect and all traffic is proxied/sniffed.
+- ARP spoofing (LAN): Poisoning ARP tables so victims send traffic to the attacker’s MAC; attacker forwards to the real gateway.
+- DNS spoofing/hijack: Tamper with DNS answers so victims go to attacker-controlled servers.
+
+### Mitigations
+
+- End-to-end encryption: Always use TLS (HTTPS, SMTPS, IMAPS). Prefer HSTS, TLS 1.2+, strong ciphers.
+- Certificate validation: distrust unknown CAs, watch for cert warnings.
+- Secure DNS: DNS over TLS/HTTPS to a trusted resolver; DNSSEC validation (validates DNS data itself).
+- Wi-Fi: WPA2-Enterprise/WPA3, disable open SSIDs, use per-user creds or EAP-TLS.
 
 ## Side-Channel Attacks
 
-Leaking info via timing or power analysis.
+Leaking info via third-party modules and systems.
 
 Is bug: No
 
 ### Examples
 
-- Use clock to control random number generation
+- Use clock to control random number generation.
+- Use power consumption to understand how many characters of a password are correct.
 - Attack host system or network and gain control of private key.
 
 ### Mitigations
 
-- Use constant-time cryptographic operations.
+- Use constant-time cryptographic operations (i.e run action on all bytes, no matter how many are correct).
+- Add random wait time for validation processes. 
 - Isolate sensitive code (TPM, hardware modules).
-- Get private keys
 
 ## Denial of Service (DoS)
 
@@ -1337,21 +1528,23 @@ Is bug: Yes
 
 ### Examples
 
-- Dynami code execution
-  - `compile()` used to compile code, can be executed with `exec()`.
+- Dynamic code execution
+  - `compile()` used to compile code, can be executed with `exec(code, globals(), locals())`.
   - `eval(code)` - runs code directly
   - They run arbitrary code, dangerous because of potential malicious code injection (i.e using `command1 ; command2`).
+  - Example: `eval("__import__('os').system('rm -rf /')")`
 - `input()` - in python 2 it gets user input and is interpreted as code.
   If a variable `password = 123` exists and the user inputs `password` then the return value will be `123`. `raw_input()` should be used in python 2.
 - Pickle module - serializes code, dangerous because an attacker can run code on target (deserilizer) machine
+- Dynamic import: `import importlib; module = importlib.import_module('socket')`
 
 ### Mitigations
 
-- limit code execution scope - exec(code, globals(), locals())
 - Never use `eval` or `exec` on untrusted data.
 - Disable imports: `exec(code, {'__builtins__': None}, {})`.
-  - Trying to bypass import limit - (2,3).**class**.**base**.**subclasses**()
+  - Trying to bypass import limit - `(2,3).__class__.__base__.__subclasses__()`
 - Use sandboxing or virtual machines.
+- Giving only specific lists of functions to run (remote method invocation).
 
 ## SQL Injection
 
@@ -1362,7 +1555,7 @@ Is bug: Yes
 ### Mitigations
 
 - Use parameterized queries
-  ```
+  ```python
   cur.execute("SELECT * FROM Table WHERE Name = ? AND City = ?",[name,city])
   ```
 - Validate input types.
@@ -1379,7 +1572,7 @@ Is bug: No
 Prevention:
 
 - Enable ASLR and DEP.
-- Use safe allocators.
+- Use safe allocators (guard pages, canaries, randomization - similar to stack protections).
 - Randomize heap structures.
 
 ## Return Oriented Programming (ROP)
@@ -1395,9 +1588,6 @@ Is bug: No
 - Enable ASLR and Control Flow Integrity.
 - Use non-executable stack/heap.
 - Maintain shadow stack integrity.
-
-- If a system gives feedback on correct/incorrect input, then the user can try many combinations until he succeeds.
-- mitigations: create many possible combinations or delay between attempts.
 
 ## IP or TCP layer IDS Evasion
 
@@ -1487,7 +1677,7 @@ In active FTP, the client sends `PORT <ip,port>` telling the server where to ope
 
 ## SMTP Open Relay
 
-An open relay lets anyone send mail to anywhere via your server → spam, IP/domain reputation damage, blacklisting.
+An open relay lets anyone send mail to anywhere via your server, which allows users to send spam and will make hurt your IP or domain reputation damage, or even make it blacklisted.
 
 ### Mitigations
 
@@ -1514,19 +1704,17 @@ An attacker gets their JavaScript to run in a victim’s browser in the context 
 
 ## CSRF — Cross-Site Request Forgery
 
-An attacker tricks a logged-in user’s browser into sending a legitimate-looking request to your site (e.g., “transfer money”) without the user’s intent. The browser automatically includes cookies (session), so the server thinks it’s the user.
+An attacker tricks a logged-in user’s browser into sending a legitimate-looking request to your site (e.g. “transfer money”) without the user’s intent. The browser automatically includes cookies (session), so the server thinks it’s the user.
 
-Simple example
-If `/settings/email` accepts:
+### Examples
 
-An attacker page can auto-submit a hidden form to that URL. The victim’s browser attaches the session cookie, and the server applies the change.
+- An attacker page can auto-submit a hidden form to that URL. The victim’s browser attaches the session cookie, and the server applies the change.
 
 ### Mitigations
 
 - CSRF tokens (synchronizer pattern): unique, unpredictable token per session/form, verified server-side.
 - SameSite cookies (`Lax`/`Strict`) to limit cross-site cookie sending.
 - Check `Origin`/`Referer` as an additional signal (not sole control).
-- Double-submit cookie pattern when you don’t keep server-side state.
 - Use custom headers + CORS preflight for sensitive endpoints accessed via XHR/fetch.
 
 ## Cpp-Specific Attacks
@@ -1560,7 +1748,7 @@ Dynamic analysis inspects program behavior at runtime (fuzzing, instrumentation,
   - Strengths: early detection, broad code coverage, no need to run untrusted code.
   - Weaknesses: false positives, limited visibility into runtime behavior and environment-specific bugs.
 - Dynamic analysis
-  - Tools: fuzzers, sanitizers (ASAN, UBSAN), debuggers, instrumentation frameworks (Pin/DynamoRIO), runtime profilers.
+  - Tools: fuzzers, sanitizers (detect memory errors), debuggers, runtime profilers.
   - Example: using Valgrind to detect memory leaks and buffer overflows.
   - Strengths: finds bugs that manifest only at runtime (race conditions, memory corruption).
   - Weaknesses: requires workloads / inputs to exercise code paths; may miss rare paths.
@@ -1627,7 +1815,7 @@ Vulnerability indexes are structured systems used to categorize, prioritize, and
   - CVSS (Common Vulnerability Scoring System): numeric score (0–10) that encodes attack vector, complexity, privileges required, user interaction, impact on confidentiality/integrity/availability, and temporal/environmental modifiers.
   - CWE (Common Weakness Enumeration): taxonomy of types of software weaknesses (e.g., CWE-79 Cross-site Scripting, CWE-119 Buffer Overflow). Helps classify root cause and improve secure practices.
 
-## Non-Executable Stack and Heap
+## Non-Executable Stack and Heap / Data Execution Prevention (DEP)
 
 A non-executable (NX) stack/heap marks memory regions used for data (like stack or heap) as non-executable, preventing code injected into those regions from being executed directly.
 
@@ -1683,12 +1871,6 @@ A Trusted Platform Module (TPM) is a hardware security module (a discrete chip o
   - Disk encryption key storage (e.g., BitLocker), secure boot chains, attestation for cloud VMs, measured launch of sensitive workloads.
 - Security guarantee:
   - The promise is that private keys and certain operations happen inside a hardened module — the module enforces that sensitive material never leaves it in the clear.
-
-## Notes
-
-- Defensive layering is crucial: ASLR + NX + CFI + sandboxing + secure build flags + auditing reduces the probability of successful exploitation.
-- Testing: use static/dynamic analysis and sandboxed fuzzing to validate mitigations. Try controlled disabling (e.g., ASLR off) in test environments to reproduce exploits for hardening.
-- Risk-based prioritization: vulnerability indexes (CVSS/CWE) help decide which mitigations and patches to deploy first.
 
 ---
 
@@ -1765,10 +1947,9 @@ TLS (used by HTTPS) combines both encryption types:
 
 ## Used Files
 
-- `.key` – usually a private key (RSA/EC). Keep secret.
-  Used by servers (and sometimes clients) to prove identity and to do key exchange or signatures.
-- `.crt` (or `.cer`) – a certificate: public key + identity + issuer + validity, typically X.509. Often PEM-encoded, sometimes DER.
 - `.pem` – a container/encoding (“Privacy-Enhanced Mail”). It’s just Base64 with header/footer lines. A `.pem` can hold a certificate, a private key, a chain (multiple certs), or something else. The extension tells you little; the headers tell you what’s inside:
+- `.key` – usually a private key (RSA/EC). Keep secret.
+- `.crt` (or `.cer`) – a certificate: public key + identity + issuer + validity, typically X.509. Often PEM-encoded, sometimes DER.
 
   ```
   -----BEGIN CERTIFICATE-----      (an X.509 cert)
@@ -1795,18 +1976,46 @@ Typical TLS chain on disk:
 ## How Trust Works
 
 - Server certificate is signed by a Certificate Authority (CA).
-- The client verifies the CA’s digital signature on the server certificate using the CA’s public key from its trust store (root CA, or an intermediate chain up to a trusted root). No decryption step is needed to “see” the cert; it’s already readable.
+- The client verifies the CA’s digital signature on the server certificate using the CA’s public key from its trust store (root CA, or an intermediate chain up to a trusted root).
 - If verification and hostname checks pass, the client trusts the server’s identity.
 - During TLS, the server also proves possession of the matching private key (to prevent someone from just presenting a copied cert).
-- A self-signed certificate is one where issuer == subject: the certificate is signed by its own private key (no external CA). Used by - Local testing and private ecosystems.
-- Usually server does not authenticate client because the server does not depend on the client, if it does
-  then the client can have a certificate also.
+- A self-signed certificate is one where issuer == subject: the certificate is signed by its own private key (no external CA). Used by testing programs and private ecosystems.
+- Usually server does not authenticate client because the server does not depend on the client, if it does then the client can have a certificate also.
 
 ## Minimal TLS handshake flow (simplified)
 
 1. Client connects, receives server certificate (and chain).
-2. Client validates: signature chain → trusted root, validity dates, revocation (OCSP/CRL), and hostname/SAN matches.
+2. Client validates: signature chain → trusted root, validity dates, and hostname/SAN matches.
 3. Server proves it owns the private key corresponding to the cert’s public key (via key exchange/signature).
 4. They derive symmetric session keys and switch to encrypted traffic.
 
-# Misc
+
+# Surprising
+- Convert string to int - `std::stoi()` | int to string - `std::to_string()`
+- Pointer to function - `int (*fp)(int,int)`
+- Stream friend function - `friend std::ostream& operator<<(std::ostream& stream, const Buffer& buf) { return stream << buf.data; }`
+- `std::map` - `ages.insert_or_assign("Tom", 31)`, `ages.at("Tom")`
+ages.at("Tom")
+- `std::vector` - 
+  - Ctor - `std::vector<int> v2(10, 0); // (items, initial_value)`
+  - find - `auto it = std::find(v3.begin(), v3.end(), 3); if (it != v3.end()) { return -1; } `
+  - Access items - `.front()`, `.back()`
+- Special functions:
+  - `__getattr__` - item not found normmally
+  - `__getattribute__` - every member every access
+  - `__setattr__` - every assignment
+- When DNS uses TCP: If the response doesn’t fit in UDP (even with EDNS0) or the server sets TC=1 (Truncated), the client retries over TCP.
+- SQL using Cpp:
+  ```cpp
+  sqlite3* db = nullptr;
+  char *query = nullptr;
+  char* error = nullptr;
+  int result = 0;
+  int result = sqlite3_open("database.db", &db);
+  if (result != SQLITE_OK) { /* error */ }
+  char* query = "QUERY;";
+  result = sqlite3_exec(db, query, nullptr, nullptr, &error);
+  if (result != SQLITE_OK) { /* error */ }
+  sqlite3_close(db);
+  ```
+- SafeSEH (Safe Structured Exception Handling) restricts exception handler addresses to a validated list in the binary’s load-time table, preventing an attacker from using arbitrary exception handlers to gain control.
