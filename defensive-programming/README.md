@@ -1333,10 +1333,10 @@ char* error = nullptr;
 int result = 0;
 
 
-int result = sqlite3_open("database.db", &db);
+result = sqlite3_open("database.db", &db);
 if (result != SQLITE_OK) { /* error */ }
 
-char* query = "QUERY;";
+query = "QUERY;";
 result = sqlite3_exec(db, query, nullptr, nullptr, &error);
 if (result != SQLITE_OK) { /* error */ }
 
@@ -1993,12 +1993,12 @@ Typical TLS chain on disk:
 # Surprising
 - Convert string to int - `std::stoi()` | int to string - `std::to_string()`
 - Pointer to function - `int (*fp)(int,int)`
-- Stream friend function - `friend std::ostream& operator<<(std::ostream& stream, const Buffer& buf) { return stream << buf.data; }`
+- Stream friend function - `friend std::ostream& operator<<(std::ostream& stream, const Buffer& buffer) { return stream << buffer.data; }`
 - `std::map` - `ages.insert_or_assign("Tom", 31)`, `ages.at("Tom")`
 ages.at("Tom")
 - `std::vector` - 
-  - Ctor - `std::vector<int> v2(10, 0); // (items, initial_value)`
-  - find - `auto it = std::find(v3.begin(), v3.end(), 3); if (it != v3.end()) { return -1; } `
+  - Ctor - `std::vector<int> v(10, 0); // (items, initial_value)`
+  - find - `auto it = std::find(v.begin(), v.end(), item); if (it == v.end()) { return "Not found"; } `
   - Access items - `.front()`, `.back()`
 - Special functions:
   - `__getattr__` - item not found normmally
@@ -2011,9 +2011,9 @@ ages.at("Tom")
   char *query = nullptr;
   char* error = nullptr;
   int result = 0;
-  int result = sqlite3_open("database.db", &db);
+  result = sqlite3_open("database.db", &db);
   if (result != SQLITE_OK) { /* error */ }
-  char* query = "QUERY;";
+  query = "QUERY;";
   result = sqlite3_exec(db, query, nullptr, nullptr, &error);
   if (result != SQLITE_OK) { /* error */ }
   sqlite3_close(db);
