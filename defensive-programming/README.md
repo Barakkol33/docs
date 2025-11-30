@@ -655,7 +655,7 @@ int main() {
 
     int size = 1024;
     char result[size];
-    out.read(result, size);
+    in.read(result, size);
 
     // Open in binary mode.
     std::ofstream file;
@@ -1569,8 +1569,6 @@ Is bug: No
 
 ### Mitigations
 
-Prevention:
-
 - Enable ASLR and DEP.
 - Use safe allocators (guard pages, canaries, randomization - similar to stack protections).
 - Randomize heap structures.
@@ -1587,7 +1585,6 @@ Is bug: No
 
 - Enable ASLR and Control Flow Integrity.
 - Use non-executable stack/heap.
-- Maintain shadow stack integrity.
 
 ## IP or TCP layer IDS Evasion
 
@@ -1606,8 +1603,6 @@ An attacker splits packets so that middleboxes (IDS/firewalls) and the end host 
 
 - Make the IDS/firewall emulate the target OS reassembly behavior (OS fingerprinting + matching policy).
 - Normalize traffic: drop malformed/overlapping fragments, enforce sane TTL/DF, clamp segment sizes.
-- Bounds-check before adding fragments to the reassembly buffer.
-- Prefer inline devices that defragment/stream-reassemble consistently for all downstream controls.
 
 ## UDP Amplification & Spoofing
 
@@ -1662,7 +1657,6 @@ Requirements for the attacker: Their fake reply must match the outstanding query
 
 - DNSSEC – cryptographic signatures on DNS records; validates authenticity (the fundamental fix).
 - More entropy – randomize TXID and source port; optionally use 0x20 case randomization on QNAME.
-- Resolver hardening – query name minimization, limit open recursion.
 - Operational controls – rate limiting (RRL), monitoring for anomalies, don’t run open resolvers (limit use only for your DNS server).
 
 ## FTP Bounce
@@ -1683,7 +1677,7 @@ An open relay lets anyone send mail to anywhere via your server, which allows us
 
 - Require SMTP AUTH and restrict relay to authenticated users or trusted networks.
 - Deploy SPF, DKIM, and DMARC to authenticate senders and publish handling policy.
-- Use RBLs, rate limiting, greylisting, and sensible acceptance policies.
+- Use rate limiting, greylisting, and sensible acceptance policies.
 
 ## XSS — Cross-Site Scripting
 
@@ -1715,7 +1709,6 @@ An attacker tricks a logged-in user’s browser into sending a legitimate-lookin
 - CSRF tokens (synchronizer pattern): unique, unpredictable token per session/form, verified server-side.
 - SameSite cookies (`Lax`/`Strict`) to limit cross-site cookie sending.
 - Check `Origin`/`Referer` as an additional signal (not sole control).
-- Use custom headers + CORS preflight for sensitive endpoints accessed via XHR/fetch.
 
 ## Cpp-Specific Attacks
 
