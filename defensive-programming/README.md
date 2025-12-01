@@ -149,6 +149,7 @@ After we design the general structure of a system we delve into each object / en
 - Use of virtual destructor.
 - Polymorphism through base pointer.
 - Note: calling virtual functions in ctor does not work as expected, original function will be called.
+- By default, `class` fields are `private` (for encapsulation) and `struct` fields are `public` (to ensure compatbility with C).
 
 ```cpp
 class Shape {
