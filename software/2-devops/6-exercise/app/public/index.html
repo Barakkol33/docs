@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guestbook</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; color: #333; padding: 2rem; }
+    .container { max-width: 600px; margin: 0 auto; }
+    h1 { margin-bottom: 1.5rem; font-size: 1.8rem; }
+    .form { background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+    .form input, .form textarea { width: 100%; padding: 0.6rem; margin-bottom: 0.8rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; font-family: inherit; }
+    .form textarea { resize: vertical; min-height: 80px; }
+    .form button { background: #2563eb; color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 4px; font-size: 0.95rem; cursor: pointer; }
+    .form button:hover { background: #1d4ed8; }
+    .form button:disabled { background: #93c5fd; cursor: not-allowed; }
+    .error { color: #dc2626; font-size: 0.85rem; margin-bottom: 0.5rem; display: none; }
+    .messages { list-style: none; }
+    .messages li { background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 0.8rem; }
+    .messages .name { font-weight: 600; margin-bottom: 0.3rem; }
+    .messages .text { color: #555; }
+    .messages .time { font-size: 0.75rem; color: #999; margin-top: 0.3rem; }
+    .empty { color: #999; text-align: center; padding: 2rem; }
+    .status { font-size: 0.8rem; color: #999; text-align: right; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Guestbook</h1>
+
+    <div class="form">
+      <input type="text" id="name" placeholder="Your name" maxlength="50">
+      <textarea id="message" placeholder="Write a message..." maxlength="500"></textarea>
+      <div class="error" id="error"></div>
+      <button id="post-btn" onclick="postMessage()">Post</button>
+    </div>
+
+    <ul class="messages" id="messages"></ul>
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    const API = '/api/messages';
+
+    async function loadMessages() {
+      try {
+        const res = await fetch(API);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const messages = await res.json();
+        const list = document.getElementById('messages');
+
+        if (messages.length === 0) {
+          list.innerHTML = '<div class="empty">No messages yet. Be the first!</div>';
+        } else {
+          list.innerHTML = messages.map(m => `
+            <li>
+              <div class="name">${escapeHtml(m.name)}</div>
+              <div class="text">${escapeHtml(m.text)}</div>
+              <div class="time">${new Date(m.timestamp).toLocaleString()}</div>
+            </li>
+          `).join('');
+        }
+
+        document.getElementById('status').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+      } catch (err) {
+        document.getElementById('status').textContent = `Error loading messages: ${err.message}`;
+      }
+    }
+
+    async function postMessage() {
+      const nameEl = document.getElementById('name');
+      const msgEl = document.getElementById('message');
+      const errEl = document.getElementById('error');
+      const btn = document.getElementById('post-btn');
+
+      const name = nameEl.value.trim();
+      const text = msgEl.value.trim();
+
+      errEl.style.display = 'none';
+      if (!name || !text) {
+        errEl.textContent = 'Please fill in both fields.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, text }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        msgEl.value = '';
+        await loadMessages();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Load messages on page load and refresh every 5 seconds
+    loadMessages();
+    setInterval(loadMessages, 5000);
+  </script>
+</body>
+</html>

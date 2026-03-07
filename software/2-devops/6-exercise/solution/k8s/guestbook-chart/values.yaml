@@ -1,0 +1,12 @@
+replicaCount: 2
+
+image:
+  repository: guestbook
+  tag: dev
+  pullPolicy: Never
+
+redis:
+  password: p@ssword123
+
+seed:
+  enabled: true

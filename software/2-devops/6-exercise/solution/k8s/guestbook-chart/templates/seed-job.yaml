@@ -1,0 +1,32 @@
+{{- if .Values.seed.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-messages
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed
+          image: redis:7-alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              redis-cli -h $DB_HOST -a $DB_PASSWORD \
+                LPUSH messages '{"name":"Alice","text":"Welcome to the guestbook!","timestamp":"2026-01-01T10:00:00Z"}' && \
+              redis-cli -h $DB_HOST -a $DB_PASSWORD \
+                LPUSH messages '{"name":"Bob","text":"Great app!","timestamp":"2026-01-01T10:01:00Z"}' && \
+              redis-cli -h $DB_HOST -a $DB_PASSWORD \
+                LPUSH messages '{"name":"seed","text":"Hello from Job!","timestamp":"2026-01-01T10:02:00Z"}' && \
+              echo "Seeded 3 messages"
+          envFrom:
+            - configMapRef:
+                name: guestbook-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-auth
+                  key: password
+{{- end }}

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: guestbook-config
+data:
+  DB_HOST: "redis.{{ .Release.Namespace }}.svc.cluster.local"
+  LOG_LEVEL: "info"
