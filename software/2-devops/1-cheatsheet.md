@@ -217,6 +217,8 @@ CMD ["python", "main.py"]   # default command
 ### kubectl — view resources
 
 ```bash
+kubectl ctx <name>                                 # set context
+kubectl ns <name>                                  # set namespace
 kubectl get all -n <ns>                            # overview
 kubectl get pods -o wide                           # pods with node and IP
 kubectl get pods -l app=web                        # filter by label
