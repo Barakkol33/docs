@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code — Guide for Non-Programmers</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .slide {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 60px 80px;
+            text-align: center;
+        }
+
+        .slide.active { display: flex; }
+
+        h1 {
+            font-size: 3.2em;
+            font-weight: 700;
+            margin-bottom: 0.4em;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2.4em;
+            font-weight: 600;
+            margin-bottom: 0.6em;
+            color: #93c5fd;
+        }
+
+        .subtitle {
+            font-size: 1.4em;
+            color: #94a3b8;
+            margin-bottom: 1em;
+        }
+
+        p, li {
+            font-size: 1.3em;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        ul {
+            list-style: none;
+            text-align: left;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        ul li {
+            padding: 0.4em 0;
+            padding-left: 1.5em;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+        }
+
+        strong { color: #f1f5f9; }
+
+        code {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 0.9em;
+            color: #7dd3fc;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px 32px;
+            text-align: left;
+            max-width: 750px;
+            width: 100%;
+            margin-top: 1em;
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #7dd3fc;
+        }
+
+        .code-block .comment { color: #64748b; }
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #86efac; }
+
+        .table-wrap {
+            max-width: 850px;
+            width: 100%;
+            margin-top: 1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1.1em;
+        }
+
+        th {
+            background: #1e293b;
+            color: #93c5fd;
+            padding: 12px 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px 20px;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e1;
+        }
+
+        tr:hover td { background: #1e293b44; }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 1.2em;
+            letter-spacing: 0.5px;
+        }
+
+        .quote {
+            background: #1e293b;
+            border-left: 4px solid #60a5fa;
+            border-radius: 0 12px 12px 0;
+            padding: 20px 28px;
+            margin-top: 1em;
+            max-width: 750px;
+            text-align: left;
+            font-style: italic;
+            color: #94a3b8;
+            font-size: 1.2em;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav button {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #93c5fd;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav button:hover {
+            background: #334155;
+            transform: scale(1.1);
+        }
+
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+
+        .slide-number {
+            position: fixed;
+            bottom: 36px;
+            left: 40px;
+            color: #475569;
+            font-size: 0.95em;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 900px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .col h3 {
+            color: #93c5fd;
+            font-size: 1.2em;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide active">
+    <h1>Claude Code</h1>
+    <p class="subtitle">Guide & Tips for Non-Programmers</p>
+    <p style="color: #64748b; margin-top: 1em;">Use arrow keys or buttons to navigate</p>
+</div>
+
+<!-- Slide 2: Learning -->
+<div class="slide">
+    <span class="badge">MINDSET</span>
+    <h2>You Can Learn Anything</h2>
+    <p style="max-width: 700px; margin-top: 0.5em;">
+        This guide introduces basic terms and technologies.<br><br>
+        Want to know more? Google it or ask your favorite LLM.<br><br>
+        <strong>You are limited only by your imagination (and time).</strong>
+    </p>
+</div>
+
+<!-- Slide 3: VS Code -->
+<div class="slide">
+    <span class="badge">SKILL 1</span>
+    <h2>VS Code</h2>
+    <p class="subtitle">A supercharged Notepad</p>
+    <ul>
+        <li><strong>File Explorer</strong> (left sidebar) — browse your files</li>
+        <li><strong>Editor</strong> (center) — view and edit files</li>
+        <li><strong>Terminal</strong> (bottom panel) — built-in command line</li>
+        <li><strong>Extensions</strong> — plugins that add new abilities</li>
+        <li><strong>Command Palette</strong> — <code>Ctrl+Shift+P</code> to find any action</li>
+    </ul>
+</div>
+
+<!-- Slide 4: VS Code Shortcuts -->
+<div class="slide">
+    <span class="badge">SKILL 1</span>
+    <h2>VS Code Shortcuts</h2>
+    <div class="table-wrap">
+        <table>
+            <tr><th>Action</th><th>Shortcut</th></tr>
+            <tr><td>Command Palette</td><td><code>Ctrl+Shift+P</code></td></tr>
+            <tr><td>Open file by name</td><td><code>Ctrl+P</code></td></tr>
+            <tr><td>Toggle terminal</td><td><code>Ctrl+`</code></td></tr>
+            <tr><td>Save file</td><td><code>Ctrl+S</code></td></tr>
+            <tr><td>Find in all files</td><td><code>Ctrl+Shift+F</code></td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- Slide 5: Terminal -->
+<div class="slide">
+    <span class="badge">SKILL 2</span>
+    <h2>Command Line</h2>
+    <p class="subtitle">A text-based way to talk to your computer</p>
+    <div class="two-col" style="margin-top: 1em;">
+        <div class="col">
+            <h3>Bash (Mac / Linux)</h3>
+            <p>The default on Mac and Linux. Most tutorials assume Bash.</p>
+        </div>
+        <div class="col">
+            <h3>CMD & PowerShell (Windows)</h3>
+            <p>CMD is basic. PowerShell is more powerful and supports similar commands to Bash.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6: Terminal Commands -->
+<div class="slide">
+    <span class="badge">SKILL 2</span>
+    <h2>Common Commands</h2>
+    <div class="table-wrap">
+        <table>
+            <tr><th>Action</th><th>Bash</th><th>CMD</th></tr>
+            <tr><td>Where am I?</td><td><code>pwd</code></td><td><code>cd</code></td></tr>
+            <tr><td>List files</td><td><code>ls</code></td><td><code>dir</code></td></tr>
+            <tr><td>Show file</td><td><code>cat file.txt</code></td><td><code>type file.txt</code></td></tr>
+            <tr><td>Copy a file</td><td><code>cp a.txt b.txt</code></td><td><code>copy a.txt b.txt</code></td></tr>
+            <tr><td>Delete a file</td><td><code>rm file.txt</code></td><td><code>del file.txt</code></td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- Slide 7: Python -->
+<div class="slide">
+    <span class="badge">SKILL 4</span>
+    <h2>Python</h2>
+    <p class="subtitle">A beginner-friendly programming language</p>
+    <div class="code-block">
+        <span class="comment"># Run from terminal</span><br>
+        python my_script.py<br><br>
+        <span class="comment"># Install a module</span><br>
+        pip install pandas<br><br>
+        <span class="comment"># Use it in code</span><br>
+        <span class="keyword">import</span> pandas
+    </div>
+    <p style="margin-top: 1em; font-size: 1em; color: #94a3b8;">
+        Got <code>ModuleNotFoundError</code>? Just <code>pip install</code> it.
+    </p>
+</div>
+
+<!-- Slide 8: HTML/CSS/JS -->
+<div class="slide">
+    <span class="badge">SKILL 5</span>
+    <h2>HTML, CSS & JavaScript</h2>
+    <p class="subtitle">The building blocks of websites</p>
+    <ul>
+        <li><strong>HTML</strong> — structure & content</li>
+        <li><strong>CSS</strong> — colors, fonts, layout</li>
+        <li><strong>JavaScript</strong> — interactivity & behavior</li>
+    </ul>
+    <p style="margin-top: 1em; color: #94a3b8;">
+        Just open any <code>.html</code> file in your browser to see it work.
+    </p>
+</div>
+
+<!-- Slide 9: Claude Code -->
+<div class="slide">
+    <span class="badge">SKILL 6</span>
+    <h2>Claude Code</h2>
+    <p class="subtitle">An AI assistant that edits files for you</p>
+    <ul>
+        <li><strong>Edit files</strong> — "change the heading color to red"</li>
+        <li><strong>Create files</strong> — "make a website with a contact form"</li>
+        <li><strong>Explain code</strong> — "what does this file do?"</li>
+        <li><strong>Run commands</strong> — it runs terminal commands on your behalf</li>
+    </ul>
+</div>
+
+<!-- Slide 10: Things to Try -->
+<div class="slide">
+    <span class="badge">SKILL 6</span>
+    <h2>Things to Try</h2>
+    <div style="text-align: left; max-width: 800px;">
+        <div class="quote">"Create a markdown file called meeting-notes.md with sections for date, attendees, and action items"</div>
+        <div class="quote" style="margin-top: 0.8em;">"Write a Python script that reads a CSV and prints the total of the 'amount' column"</div>
+        <div class="quote" style="margin-top: 0.8em;">"Create an HTML presentation from this text"</div>
+    </div>
+</div>
+
+<!-- Slide 11: Meta -->
+<div class="slide">
+    <h2>This Presentation is Proof</h2>
+    <p style="max-width: 650px; margin-top: 0.5em; font-size: 1.3em;">
+        This entire slideshow was generated by Claude Code from the guide's markdown content.
+    </p>
+    <p style="margin-top: 1.5em; color: #64748b; font-size: 1.1em;">
+        Just open the <code>.html</code> file in a browser. No PowerPoint needed.
+    </p>
+</div>
+
+<!-- Navigation -->
+<div class="progress" id="progress"></div>
+<div class="slide-number" id="slideNumber"></div>
+<div class="nav">
+    <button onclick="navigate(-1)">&#8592;</button>
+    <button onclick="navigate(1)">&#8594;</button>
+</div>
+
+<script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+
+    function showSlide(n) {
+        slides[current].classList.remove('active');
+        current = (n + total) % total;
+        slides[current].classList.add('active');
+        document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+        document.getElementById('slideNumber').textContent = (current + 1) + ' / ' + total;
+    }
+
+    function navigate(dir) { showSlide(current + dir); }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') navigate(1);
+        if (e.key === 'ArrowLeft') navigate(-1);
+    });
+
+    showSlide(0);
+</script>
+
+</body>
+</html>

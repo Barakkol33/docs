@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code — Animated Showcase</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #030712;
+            --surface: #111827;
+            --border: #1f2937;
+            --text: #e5e7eb;
+            --muted: #6b7280;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --pink: #ec4899;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            cursor: none;
+        }
+
+        /* ── Custom cursor ── */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--blue);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease, border-color 0.3s;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-dot {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--blue);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+        .cursor.hover { transform: translate(-50%, -50%) scale(2); border-color: var(--purple); }
+
+        /* ── Animated background ── */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: orbFloat 15s ease-in-out infinite;
+        }
+        .orb:nth-child(1) { width: 500px; height: 500px; background: var(--blue); top: -10%; left: -5%; animation-delay: 0s; }
+        .orb:nth-child(2) { width: 400px; height: 400px; background: var(--purple); bottom: -10%; right: -5%; animation-delay: -5s; }
+        .orb:nth-child(3) { width: 350px; height: 350px; background: var(--cyan); top: 50%; left: 50%; animation-delay: -10s; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* ── Particle canvas ── */
+        #particles { position: fixed; inset: 0; z-index: 0; }
+
+        /* ── Slides ── */
+        .slide {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 60px 80px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .slide.active {
+            display: flex;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(40px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── Stagger children ── */
+        .slide.active > * { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .slide.active > *:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active > *:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active > *:nth-child(3) { animation-delay: 0.35s; }
+        .slide.active > *:nth-child(4) { animation-delay: 0.5s; }
+        .slide.active > *:nth-child(5) { animation-delay: 0.65s; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Typography ── */
+        h1 {
+            font-size: 4.5em;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+        h2 {
+            font-size: 3em;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5em;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--blue), var(--purple), var(--cyan));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        p { font-size: 1.3em; line-height: 1.7; color: var(--text); max-width: 750px; }
+
+        /* ── Badge ── */
+        .badge {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 1em;
+            border: 1px solid;
+        }
+        .badge-blue { color: var(--blue); border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.08); }
+        .badge-purple { color: var(--purple); border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.08); }
+        .badge-cyan { color: var(--cyan); border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.08); }
+        .badge-emerald { color: var(--emerald); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08); }
+        .badge-rose { color: var(--rose); border-color: rgba(244,63,94,0.3); background: rgba(244,63,94,0.08); }
+
+        /* ── Cards ── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            margin-top: 1em;
+        }
+        .card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--blue), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59,130,246,0.3);
+            box-shadow: 0 20px 40px -15px rgba(59,130,246,0.15);
+        }
+        .card:hover::before { opacity: 1; }
+        .card-icon {
+            font-size: 2em;
+            margin-bottom: 0.4em;
+            display: block;
+        }
+        .card h3 { font-size: 1.1em; font-weight: 600; margin-bottom: 0.3em; }
+        .card p { font-size: 0.95em; color: var(--muted); line-height: 1.5; }
+
+        /* ── Typing animation ── */
+        .typewriter {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.4em;
+            color: var(--cyan);
+            border-right: 2px solid var(--cyan);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 2.5s steps(40) 0.8s forwards, blink 0.7s step-end infinite;
+        }
+        @keyframes typing { to { width: 100%; } }
+        @keyframes blink { 50% { border-color: transparent; } }
+
+        /* ── Terminal mockup ── */
+        .terminal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 700px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 1em;
+            text-align: left;
+        }
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border);
+        }
+        .terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .terminal-dot.red { background: #ef4444; }
+        .terminal-dot.yellow { background: #eab308; }
+        .terminal-dot.green { background: #22c55e; }
+        .terminal-title { color: var(--muted); font-size: 0.8em; margin-left: 8px; }
+        .terminal-body {
+            padding: 20px 24px;
+            font-family: 'Fira Code', monospace;
+            font-size: 1em;
+            line-height: 2;
+        }
+        .terminal-body .prompt { color: var(--emerald); }
+        .terminal-body .cmd { color: var(--text); }
+        .terminal-body .output { color: var(--muted); }
+        .terminal-body .highlight { color: var(--amber); }
+
+        .terminal-line {
+            opacity: 0;
+            animation: termLine 0.4s ease forwards;
+        }
+        .slide.active .terminal-line:nth-child(1) { animation-delay: 0.5s; }
+        .slide.active .terminal-line:nth-child(2) { animation-delay: 1.0s; }
+        .slide.active .terminal-line:nth-child(3) { animation-delay: 1.5s; }
+        .slide.active .terminal-line:nth-child(4) { animation-delay: 2.0s; }
+        .slide.active .terminal-line:nth-child(5) { animation-delay: 2.5s; }
+        .slide.active .terminal-line:nth-child(6) { animation-delay: 3.0s; }
+        @keyframes termLine { to { opacity: 1; } }
+
+        /* ── Code editor mockup ── */
+        .editor {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            max-width: 750px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 1em;
+        }
+        .editor-tabs {
+            display: flex;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid var(--border);
+        }
+        .editor-tab {
+            padding: 10px 20px;
+            font-size: 0.85em;
+            color: var(--muted);
+            border-right: 1px solid var(--border);
+            font-family: 'Inter', sans-serif;
+        }
+        .editor-tab.active {
+            color: var(--text);
+            background: #0d1117;
+            border-bottom: 2px solid var(--blue);
+        }
+        .editor-body {
+            padding: 20px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95em;
+            line-height: 1.9;
+            counter-reset: line;
+        }
+        .editor-line {
+            display: flex;
+            padding: 0 20px;
+            opacity: 0;
+            animation: termLine 0.3s ease forwards;
+        }
+        .slide.active .editor-line:nth-child(1) { animation-delay: 0.4s; }
+        .slide.active .editor-line:nth-child(2) { animation-delay: 0.55s; }
+        .slide.active .editor-line:nth-child(3) { animation-delay: 0.7s; }
+        .slide.active .editor-line:nth-child(4) { animation-delay: 0.85s; }
+        .slide.active .editor-line:nth-child(5) { animation-delay: 1.0s; }
+        .slide.active .editor-line:nth-child(6) { animation-delay: 1.15s; }
+        .slide.active .editor-line:nth-child(7) { animation-delay: 1.3s; }
+        .slide.active .editor-line:nth-child(8) { animation-delay: 1.45s; }
+        .slide.active .editor-line:nth-child(9) { animation-delay: 1.6s; }
+        .editor-line-num {
+            color: #374151;
+            min-width: 35px;
+            text-align: right;
+            margin-right: 20px;
+            user-select: none;
+        }
+        .editor-line-num::before { counter-increment: line; content: counter(line); }
+        .kw { color: var(--purple); }
+        .fn { color: #60a5fa; }
+        .str { color: #86efac; }
+        .cm { color: #4b5563; font-style: italic; }
+        .op { color: var(--cyan); }
+        .num { color: var(--amber); }
+        .tag { color: var(--rose); }
+        .attr { color: var(--amber); }
+
+        /* ── Floating icons ── */
+        .float-icons {
+            display: flex;
+            gap: 30px;
+            margin-top: 2em;
+        }
+        .float-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            animation: iconBounce 3s ease-in-out infinite;
+            border: 1px solid;
+        }
+        .float-icon:nth-child(1) { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.2); animation-delay: 0s; }
+        .float-icon:nth-child(2) { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.2); animation-delay: 0.3s; }
+        .float-icon:nth-child(3) { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2); animation-delay: 0.6s; }
+        .float-icon:nth-child(4) { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.2); animation-delay: 0.9s; }
+        .float-icon:nth-child(5) { background: rgba(236,72,153,0.1); border-color: rgba(236,72,153,0.2); animation-delay: 1.2s; }
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* ── Timeline ── */
+        .timeline {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            padding-left: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--blue), var(--purple), var(--cyan));
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 28px;
+            padding-left: 20px;
+            opacity: 0;
+            animation: fadeUp 0.5s ease forwards;
+        }
+        .slide.active .timeline-item:nth-child(1) { animation-delay: 0.3s; }
+        .slide.active .timeline-item:nth-child(2) { animation-delay: 0.6s; }
+        .slide.active .timeline-item:nth-child(3) { animation-delay: 0.9s; }
+        .slide.active .timeline-item:nth-child(4) { animation-delay: 1.2s; }
+        .slide.active .timeline-item:nth-child(5) { animation-delay: 1.5s; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid var(--blue);
+            background: var(--bg);
+        }
+        .timeline-item h4 { font-size: 1.1em; margin-bottom: 0.15em; }
+        .timeline-item p { font-size: 0.95em; color: var(--muted); }
+
+        /* ── Morphing shape ── */
+        .morph-container {
+            position: absolute;
+            right: 80px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.12;
+        }
+        .morph {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            animation: morph 8s ease-in-out infinite;
+        }
+        @keyframes morph {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            50% { border-radius: 50% 60% 30% 60% / 30% 40% 70% 60%; }
+            75% { border-radius: 60% 30% 60% 40% / 70% 50% 40% 60%; }
+        }
+
+        /* ── Counters ── */
+        .stats {
+            display: flex;
+            gap: 60px;
+            margin-top: 1.5em;
+        }
+        .stat { text-align: center; }
+        .stat-number {
+            font-size: 3.5em;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-label { color: var(--muted); font-size: 1em; margin-top: 0.2em; }
+        .stat:nth-child(1) .stat-number { color: var(--blue); }
+        .stat:nth-child(2) .stat-number { color: var(--purple); }
+        .stat:nth-child(3) .stat-number { color: var(--cyan); }
+
+        /* ── Chat bubble ── */
+        .chat {
+            max-width: 650px;
+            width: 100%;
+            text-align: left;
+        }
+        .chat-msg {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+            opacity: 0;
+            animation: fadeUp 0.5s ease forwards;
+        }
+        .slide.active .chat-msg:nth-child(1) { animation-delay: 0.3s; }
+        .slide.active .chat-msg:nth-child(2) { animation-delay: 1.2s; }
+        .slide.active .chat-msg:nth-child(3) { animation-delay: 2.2s; }
+        .chat-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+        .chat-avatar.user { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); }
+        .chat-avatar.ai { background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); }
+        .chat-bubble {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .chat-bubble code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--cyan);
+        }
+
+        /* ── Keyboard keys ── */
+        kbd {
+            display: inline-block;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-bottom: 3px solid #374151;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            color: var(--text);
+            margin: 0 2px;
+            transition: transform 0.1s;
+        }
+        kbd:hover {
+            transform: translateY(-1px);
+            border-bottom-width: 2px;
+        }
+
+        /* ── Rings ── */
+        .rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+        .ring {
+            position: absolute;
+            border: 1px solid rgba(59,130,246,0.1);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ringPulse 4s ease-in-out infinite;
+        }
+        .ring:nth-child(1) { width: 200px; height: 200px; animation-delay: 0s; }
+        .ring:nth-child(2) { width: 350px; height: 350px; animation-delay: 0.5s; }
+        .ring:nth-child(3) { width: 500px; height: 500px; animation-delay: 1s; }
+        .ring:nth-child(4) { width: 650px; height: 650px; animation-delay: 1.5s; }
+        @keyframes ringPulse {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.08; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        /* ── Progress & nav ── */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--purple), var(--cyan));
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+        }
+
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        .nav button {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: none;
+            transition: all 0.2s;
+        }
+        .nav button:hover {
+            background: var(--surface);
+            border-color: var(--blue);
+            transform: scale(1.08);
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 38px;
+            left: 40px;
+            color: #374151;
+            font-size: 0.9em;
+            font-variant-numeric: tabular-nums;
+            z-index: 100;
+        }
+
+        /* ── Dots nav ── */
+        .dots {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1f2937;
+            transition: all 0.3s;
+            cursor: none;
+        }
+        .dot.active {
+            background: var(--blue);
+            box-shadow: 0 0 10px rgba(59,130,246,0.4);
+            transform: scale(1.3);
+        }
+
+        /* ── Transitions ── */
+        .slide-exit {
+            animation: slideOut 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+        @keyframes slideOut {
+            to { opacity: 0; transform: translateY(-30px) scale(0.97); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.8em; }
+            h2 { font-size: 2em; }
+            .slide { padding: 40px 30px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .stats { gap: 30px; }
+            .stat-number { font-size: 2.5em; }
+            .morph-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<canvas id="particles"></canvas>
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+</div>
+
+<div class="progress-bar" id="progress"></div>
+<div class="dots" id="dots"></div>
+
+<!-- ===== SLIDE 1: Title ===== -->
+<div class="slide active" id="slide-title">
+    <div class="rings">
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    </div>
+    <h1 class="gradient-text">Claude Code</h1>
+    <p class="subtitle" style="margin-top: 0.3em;">Guide & Tips for Non-Programmers</p>
+    <div class="float-icons">
+        <div class="float-icon">VS</div>
+        <div class="float-icon">&gt;_</div>
+        <div class="float-icon">Py</div>
+        <div class="float-icon">{ }</div>
+        <div class="float-icon">AI</div>
+    </div>
+    <p style="color: #374151; font-size: 0.9em; margin-top: 2em;">
+        <kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &nbsp;|&nbsp; <kbd>Space</kbd> next
+    </p>
+</div>
+
+<!-- ===== SLIDE 2: What you'll learn ===== -->
+<div class="slide">
+    <span class="badge badge-blue">Overview</span>
+    <h2>6 Skills to Unlock</h2>
+    <div class="timeline" style="margin-top: 1em;">
+        <div class="timeline-item"><h4>VS Code</h4><p>Your new supercharged editor</p></div>
+        <div class="timeline-item"><h4>Command Line</h4><p>Talk to your computer with text</p></div>
+        <div class="timeline-item"><h4>Markdown</h4><p>Format documents with plain text</p></div>
+        <div class="timeline-item"><h4>Python</h4><p>Automate anything</p></div>
+        <div class="timeline-item"><h4>HTML / CSS / JS</h4><p>Build websites &amp; presentations</p></div>
+    </div>
+    <div class="morph-container"><div class="morph"></div></div>
+</div>
+
+<!-- ===== SLIDE 3: VS Code ===== -->
+<div class="slide">
+    <span class="badge badge-purple">Skill 1</span>
+    <h2>VS Code</h2>
+    <div class="card-grid">
+        <div class="card">
+            <span class="card-icon">&#128193;</span>
+            <h3>File Explorer</h3>
+            <p>Browse files in the left sidebar</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#9998;</span>
+            <h3>Editor</h3>
+            <p>View and edit any file type</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#9000;</span>
+            <h3>Terminal</h3>
+            <p>Built-in command line</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#128268;</span>
+            <h3>Extensions</h3>
+            <p>Plugins for new abilities</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#128269;</span>
+            <h3>Command Palette</h3>
+            <p><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#9989;</span>
+            <h3>Extensions Safety</h3>
+            <p>Prefer verified publishers</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SLIDE 4: Terminal ===== -->
+<div class="slide">
+    <span class="badge badge-cyan">Skill 2</span>
+    <h2>Command Line</h2>
+    <div class="terminal">
+        <div class="terminal-bar">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <span class="terminal-title">bash &mdash; ~/projects</span>
+        </div>
+        <div class="terminal-body">
+            <div class="terminal-line"><span class="prompt">$ </span><span class="cmd">pwd</span></div>
+            <div class="terminal-line"><span class="output">/home/user/projects</span></div>
+            <div class="terminal-line"><span class="prompt">$ </span><span class="cmd">ls -la</span></div>
+            <div class="terminal-line"><span class="output">drwxr-xr-x  my-website/</span></div>
+            <div class="terminal-line"><span class="output">-rw-r--r--  <span class="highlight">notes.md</span></span></div>
+            <div class="terminal-line"><span class="prompt">$ </span><span class="cmd">cd my-website</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SLIDE 5: Python ===== -->
+<div class="slide">
+    <span class="badge badge-emerald">Skill 4</span>
+    <h2>Python</h2>
+    <div class="editor">
+        <div class="editor-tabs">
+            <div class="editor-tab active">analysis.py</div>
+            <div class="editor-tab">data.csv</div>
+        </div>
+        <div class="editor-body">
+            <div class="editor-line"><span class="editor-line-num"></span><span class="kw">import</span> <span class="fn">pandas</span> <span class="kw">as</span> pd</div>
+            <div class="editor-line"><span class="editor-line-num"></span></div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="cm"># Read the spreadsheet</span></div>
+            <div class="editor-line"><span class="editor-line-num"></span>data <span class="op">=</span> pd.<span class="fn">read_csv</span>(<span class="str">"sales.csv"</span>)</div>
+            <div class="editor-line"><span class="editor-line-num"></span></div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="cm"># Show the total</span></div>
+            <div class="editor-line"><span class="editor-line-num"></span>total <span class="op">=</span> data[<span class="str">"amount"</span>].<span class="fn">sum</span>()</div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="fn">print</span>(<span class="str">f"Total: $</span><span class="op">{</span>total<span class="op">}</span><span class="str">"</span>)</div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="cm"># Output: Total: $12,450</span></div>
+        </div>
+    </div>
+    <p style="margin-top: 1em; font-size: 1em; color: var(--muted);">
+        Install modules: &nbsp;<kbd>pip install pandas</kbd>
+    </p>
+</div>
+
+<!-- ===== SLIDE 6: HTML/CSS/JS ===== -->
+<div class="slide">
+    <span class="badge badge-rose">Skill 5</span>
+    <h2>HTML + CSS + JS</h2>
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number" data-target="structure">HTML</div>
+            <div class="stat-label">Structure & Content</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" data-target="style">CSS</div>
+            <div class="stat-label">Colors & Layout</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number" data-target="behavior">JS</div>
+            <div class="stat-label">Interactivity</div>
+        </div>
+    </div>
+    <div class="editor" style="margin-top: 1.5em;">
+        <div class="editor-tabs">
+            <div class="editor-tab active">index.html</div>
+        </div>
+        <div class="editor-body">
+            <div class="editor-line"><span class="editor-line-num"></span><span class="tag">&lt;h1</span> <span class="attr">style=</span><span class="str">"color: blue"</span><span class="tag">&gt;</span>Hello!<span class="tag">&lt;/h1&gt;</span></div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="tag">&lt;p&gt;</span>This is a paragraph.<span class="tag">&lt;/p&gt;</span></div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="tag">&lt;button</span> <span class="attr">onclick=</span><span class="str">"alert('Hi!')"</span><span class="tag">&gt;</span></div>
+            <div class="editor-line"><span class="editor-line-num"></span>&nbsp;&nbsp;Click me</div>
+            <div class="editor-line"><span class="editor-line-num"></span><span class="tag">&lt;/button&gt;</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SLIDE 7: Claude Code ===== -->
+<div class="slide">
+    <span class="badge badge-blue">Skill 6</span>
+    <h2 class="gradient-text">Claude Code</h2>
+    <p class="subtitle" style="margin-bottom: 0.8em;">Talk to it. It does the work.</p>
+    <div class="chat">
+        <div class="chat-msg">
+            <div class="chat-avatar user">&#128100;</div>
+            <div class="chat-bubble">Create a website that shows my favorite recipes with a nice dark theme</div>
+        </div>
+        <div class="chat-msg">
+            <div class="chat-avatar ai">&#9672;</div>
+            <div class="chat-bubble">I'll create that for you. I'm writing <code>recipes.html</code> with a responsive grid layout, dark color scheme, and cards for each recipe...</div>
+        </div>
+        <div class="chat-msg">
+            <div class="chat-avatar user">&#128100;</div>
+            <div class="chat-bubble">Make the cards have rounded corners and add a search bar at the top</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SLIDE 8: What Claude can create ===== -->
+<div class="slide">
+    <span class="badge badge-purple">Possibilities</span>
+    <h2>What Can You Create?</h2>
+    <div class="card-grid">
+        <div class="card">
+            <span class="card-icon">&#128196;</span>
+            <h3>Documents</h3>
+            <p>Markdown notes, reports, meeting summaries</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#128187;</span>
+            <h3>Scripts</h3>
+            <p>Automate renaming, sorting, data processing</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#127760;</span>
+            <h3>Websites</h3>
+            <p>Landing pages, portfolios, tools</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#127916;</span>
+            <h3>Presentations</h3>
+            <p>Like this one! HTML slides from any text</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#128202;</span>
+            <h3>Data Analysis</h3>
+            <p>Read CSVs, calculate totals, make charts</p>
+        </div>
+        <div class="card">
+            <span class="card-icon">&#9881;</span>
+            <h3>Anything Else</h3>
+            <p>Just describe it in plain language</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SLIDE 9: Finale ===== -->
+<div class="slide">
+    <div class="rings">
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    </div>
+    <h1 class="gradient-text" style="font-size: 3.5em;">Start Creating</h1>
+    <p style="margin-top: 0.5em; max-width: 600px;">
+        You don't need to be a programmer.<br>
+        You just need to describe what you want.
+    </p>
+    <p style="margin-top: 2em; color: #374151; font-size: 0.95em;">
+        This entire presentation was generated by Claude Code from a markdown guide.
+    </p>
+</div>
+
+<!-- Navigation -->
+<div class="slide-counter" id="counter"></div>
+<div class="nav">
+    <button onclick="navigate(-1)">&#8592;</button>
+    <button onclick="navigate(1)">&#8594;</button>
+</div>
+
+<script>
+    // ── Particles ──
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 1.5 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.3;
+            this.speedY = (Math.random() - 0.5) * 0.3;
+            this.opacity = Math.random() * 0.3 + 0.1;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+        }
+        draw() {
+            ctx.fillStyle = `rgba(59, 130, 246, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    ctx.strokeStyle = `rgba(59, 130, 246, ${0.06 * (1 - dist / 120)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ── Custom cursor ──
+    const cursor = document.getElementById('cursor');
+    const cursorDot = document.getElementById('cursorDot');
+    let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursorDot.style.left = mouseX + 'px';
+        cursorDot.style.top = mouseY + 'px';
+    });
+
+    function updateCursor() {
+        cursorX += (mouseX - cursorX) * 0.15;
+        cursorY += (mouseY - cursorY) * 0.15;
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        requestAnimationFrame(updateCursor);
+    }
+    updateCursor();
+
+    document.querySelectorAll('button, .card, .dot').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    // ── Slides ──
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+
+    // Build dots
+    const dotsContainer = document.getElementById('dots');
+    slides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    });
+
+    function updateUI() {
+        document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+        document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    }
+
+    function goToSlide(n) {
+        if (n === current) return;
+        slides[current].classList.remove('active');
+        current = n;
+        slides[current].classList.add('active');
+        updateUI();
+    }
+
+    function navigate(dir) {
+        const next = (current + dir + total) % total;
+        goToSlide(next);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
+        if (e.key === 'Home') goToSlide(0);
+        if (e.key === 'End') goToSlide(total - 1);
+    });
+
+    // Touch support
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
+    });
+
+    updateUI();
+</script>
+
+</body>
+</html>
