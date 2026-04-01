@@ -4,86 +4,130 @@ from pathlib import Path
 from markdown_pdf import MarkdownPdf, Section
 
 DEFAULT_CSS = r"""
-/* A simple, readable, colorful theme for markdown-pdf (PyMuPDF Story). */
+/* Professional document theme for markdown-pdf (PyMuPDF Story). */
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+  font-family: "Georgia", "Times New Roman", "Noto Serif", serif;
   font-size: 11pt;
-  line-height: 1.55;
-  color: #111827; /* gray-900 */
+  line-height: 1.65;
+  color: #1a1a1a;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #0f172a; /* slate-900 */
-  line-height: 1.2;
-  margin-top: 18pt;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+  color: #1a1a2e;
+  line-height: 1.25;
+  margin-top: 22pt;
   margin-bottom: 8pt;
 }
-h1 { font-size: 24pt; border-bottom: 2px solid #e5e7eb; padding-bottom: 6pt; }
-h2 { font-size: 18pt; border-bottom: 1px solid #e5e7eb; padding-bottom: 4pt; }
-h3 { font-size: 14pt; }
+h1 {
+  font-size: 26pt;
+  font-weight: 700;
+  border-bottom: 2.5px solid #1a1a2e;
+  padding-bottom: 8pt;
+  margin-bottom: 12pt;
+}
+h2 {
+  font-size: 18pt;
+  font-weight: 600;
+  color: #2d2d4e;
+  border-bottom: 1px solid #d1d5db;
+  padding-bottom: 5pt;
+  margin-top: 26pt;
+}
+h3 {
+  font-size: 13pt;
+  font-weight: 600;
+  color: #374151;
+}
 
-p { margin: 6pt 0; }
-ul, ol { margin: 6pt 0 10pt 16pt; }
-li { margin: 3pt 0; }
+p {
+  margin: 7pt 0;
+  text-align: justify;
+}
+
+ul, ol {
+  margin: 6pt 0 12pt 18pt;
+}
+li {
+  margin: 4pt 0;
+}
+
+strong {
+  color: #111827;
+}
 
 a {
-  color: #2563eb; /* blue-600 */
+  color: #1d4ed8;
   text-decoration: none;
 }
 
 blockquote {
-  margin: 10pt 0;
-  padding: 8pt 10pt;
-  border-left: 4px solid #60a5fa; /* blue-400 */
-  background: #eff6ff; /* blue-50 */
-  color: #1f2937; /* gray-800 */
+  margin: 12pt 0;
+  padding: 10pt 14pt;
+  border-left: 3.5px solid #6366f1;
+  background: #f5f3ff;
+  color: #374151;
+  font-style: italic;
 }
 
 hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 14pt 0;
+  border-top: 1px solid #d1d5db;
+  margin: 18pt 0;
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 10pt;
-  background: #e5e7eb; /* gray-200 (more contrast on white) */
-  color: #0f172a; /* slate-900 */
-  padding: 1pt 3pt;
-  border-radius: 4pt;
+  font-size: 9.5pt;
+  background: #f3f4f6;
+  color: #1e293b;
+  padding: 1.5pt 4pt;
+  border-radius: 3pt;
+  border: 0.5px solid #e5e7eb;
 }
 
 pre {
-  background: #f3f4f6; /* gray-100 */
-  color: #0f172a; /* slate-900 */
-  padding: 10pt 12pt;
-  border-radius: 8pt;
+  background: #f8f9fa;
+  color: #1e293b;
+  padding: 12pt 14pt;
+  border-radius: 6pt;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
+  margin: 10pt 0;
 }
 pre code {
   background: transparent;
   padding: 0;
   border-radius: 0;
+  border: none;
   color: inherit;
-  font-size: 9.5pt;
+  font-size: 9pt;
+  line-height: 1.5;
 }
 
 table {
   border-collapse: collapse;
-  margin: 10pt 0;
+  margin: 12pt 0;
   width: 100%;
+  font-size: 10.5pt;
 }
 th, td {
-  border: 1px solid #e5e7eb;
-  padding: 6pt 8pt;
+  border: 1px solid #d1d5db;
+  padding: 7pt 10pt;
   vertical-align: top;
 }
 th {
-  background: #f9fafb; /* gray-50 */
-  color: #111827;
+  background: #f1f5f9;
+  color: #1e293b;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+  font-weight: 600;
+  font-size: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 0.3pt;
+}
+tr:nth-child(even) td {
+  background: #fafafa;
 }
 """
 

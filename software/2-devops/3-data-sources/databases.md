@@ -2,27 +2,6 @@
 
 ---
 
-## Cassandra
-
-A distributed wide-column NoSQL database designed for huge scale, high write throughput, and always-on availability. No single leader; built for multi-datacenter setups.
-
-**Key concepts:**
-
-- **Keyspace** – Top-level namespace (like a database).
-- **Table (wide-column)** – Rows can have many columns; optimized by primary key design.
-- **Partition Key** – Determines which node stores the data (critical for performance).
-- **Clustering Columns** – Define sort order within a partition.
-- **Replication Factor (RF)** – How many copies of data exist.
-- **Consistency Level** – Tradeoff between availability and consistency (`ONE`, `QUORUM`, `ALL`, etc.).
-- **Ring Architecture** – Nodes arranged logically; data distributed via consistent hashing.
-- **Gossip Protocol** – Nodes share cluster state.
-- **SSTables / Memtables** – Write path structures, enabling fast sequential disk writes.
-- **CQL** – Cassandra Query Language (SQL-like).
-
-**Resources:** https://www.nan.fyi/database – short tutorial highlighting Cassandra concepts.
-
----
-
 ## Elasticsearch
 
 A distributed search and analytics engine built on Lucene. Optimized for full-text search, filtering, and near real-time aggregation over large datasets.
@@ -133,39 +112,3 @@ A high-performance, columnar database for real-time analytics on huge datasets. 
 - **Compression** – Very strong due to columnar layout; huge space savings.
 - **Joins** – Supported, but performance depends on data size and join type; design to minimize heavy joins.
 - **INSERT-heavy, UPDATE-light** – Updates/deletes exist but are more expensive; best used append-only.
-
----
-
-## YugabyteDB
-
-An open-source, high-performance distributed PostgreSQL database.
-
-- **Rule of thumb:** Use it unless your data volume is very large (then use Cassandra).
-- **ACID-compliant** — you can perform operations across multiple rows or even multiple nodes, and the database guarantees they will either all succeed or all fail together.
-
-**How is it different from regular PostgreSQL?**
-
-While Yugabyte is "PostgreSQL-compatible" (it uses the upper half of the Postgres source code for its query layer), the engine underneath is entirely different:
-
-- **Architecture** – Postgres is monolithic (one server). Yugabyte is distributed (a cluster of servers).
-- **Scalability** – Postgres write scaling requires manual sharding or primary-replica setups. Yugabyte auto-shards data across all nodes — scale writes by adding servers.
-- **Availability** – Postgres has downtime during failover. Yugabyte remains active with zero data loss using Raft consensus replication.
-
----
-
-## PostgreSQL vs Cassandra
-
-### PostgreSQL
-
-The "safe" default for most applications. Choose it when your data has strict rules and complex questions.
-
-- **Data Integrity (ACID)** – When handling money or sensitive records where a "partial" update is a disaster.
-- **Complex Relationships** – You need to JOIN five different tables to generate a report.
-- **Flexible Querying** – You don’t know exactly how you’ll search your data next month. Postgres allows ad-hoc queries on any indexed column.
-
-### Cassandra
-
-A specialized tool. Choose it when you have so much data that a single server would literally explode.
-
-- **Write Speed is King** – Logging billions of sensor readings (IoT), clicks, or chat messages per second. Built for "high-velocity ingestion."
-- **Predictable Queries** – You already know exactly how you will query the data (e.g., "Get all messages for User X"). You model your data for the query, not for the relationship.
