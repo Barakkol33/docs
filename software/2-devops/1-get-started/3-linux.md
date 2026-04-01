@@ -75,7 +75,7 @@ Every file has an owner (user), a group, and permission bits (read/write/execute
 
 ```bash
 ls -la
-# -rw-r--r-- 1 barak devs 4096 Mar 07 10:00 config.yaml
+# -rw-r--r-- 1 user devs 4096 Mar 07 10:00 config.yaml
 #  ^^^           user  group
 #  user/group/others permissions
 ```
@@ -84,7 +84,7 @@ ls -la
 chmod +x script.sh         # make executable
 chmod 755 script.sh        # rwxr-xr-x (common for scripts)
 chmod 600 secrets.env      # rw------- (only owner can read/write)
-chown barak:devs file.txt  # change owner and group
+chown user:devs file.txt  # change owner and group
 ```
 
 **Why this matters for Docker/K8s:** Container images often run as non-root. Permission issues are one of the most common reasons containers fail to start — the process can't read config files or write to mounted volumes.
@@ -359,7 +359,7 @@ ssh user@host 'kubectl get pods'      # run a command remotely
 # ~/.ssh/config
 Host myserver
   HostName 10.0.1.5
-  User barak
+  User user
   IdentityFile ~/.ssh/mykey.pem
 
 # Now just:
