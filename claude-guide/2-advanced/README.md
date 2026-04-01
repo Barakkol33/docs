@@ -2,6 +2,8 @@
 
 This guide covers more technical concepts. Read the [basics guide](../1-basics/1-basics.md) first.
 
+> **Disclaimer:** I have no business relationship with any of the tools or services mentioned in this guide. These are personal recommendations based on my experience. Use them at your own discretion — I take no responsibility for any outcomes.
+
 ---
 
 ## Processes

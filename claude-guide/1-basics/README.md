@@ -94,10 +94,6 @@ You can also control your computer by typing text commands instead of clicking b
 
 VS Code (Visual Studio Code) is a free text editor by Microsoft. Think of it as a supercharged Notepad — it can open any file, color-code different languages, and run tools like Claude Code inside it.
 
-### Installation
-
-Download from [code.visualstudio.com](https://code.visualstudio.com/)
-
 ### Key concepts
 
 - **File Explorer** (left sidebar) — browse and open files in your project folder

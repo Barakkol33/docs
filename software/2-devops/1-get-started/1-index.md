@@ -142,10 +142,8 @@ When choosing a database, ask: what's the data model, consistency requirements, 
 | **PostgreSQL / MySQL** | Relational (SQL) | Structured business data, transactions, joins |
 | **Elasticsearch** | Search engine | Full-text search, filtering, aggregations |
 | **MongoDB** | Document store | Flexible JSON-like schemas, evolving data models |
-| **Cassandra** | Wide-column (NoSQL) | Massive write throughput, multi-datacenter scale |
 | **ClickHouse** | Columnar (analytics) | Fast aggregations on huge datasets (dashboards, logs) |
 | **Redis** | In-memory key-value | Caching, session store, pub/sub, real-time counters |
-| **YugabyteDB** | Distributed SQL | PostgreSQL-compatible with horizontal scaling and HA |
 
 ```sql
 -- Example: basic SQL query
