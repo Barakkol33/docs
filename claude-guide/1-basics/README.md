@@ -1,4 +1,4 @@
-# Claude Code — Guide for Non-Programmers (Basics)
+# Claude — Guide for Non-Programmers (Basics)
 
 A practical guide to enhance your use of AI, even if you've never written code before.
 
@@ -315,7 +315,7 @@ Claude asks for permission before doing things like editing files or running com
 
 ## What's Next?
 
-Ready to go further? The [advanced guide](../2-advanced/2-advanced.md) covers:
+Ready to go further? The [advanced guide](../2-advanced/README.md) covers:
 
 - **Command Line** — understand how your computer runs processes under the hood
 - **Git & GitHub** — save your work, track changes, and display it publicly from any computer or phone
