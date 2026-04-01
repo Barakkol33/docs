@@ -36,7 +36,7 @@ Let's start at the end - see what I created with Claude using a few simple promp
 
 **Game** — a small space dodge game, playable in the browser:
 
-![Game demo](demos/game.png)
+<img src="demos/game.png" alt="Game demo" width="50%">
 
 All of these are in the `demos/` folder. The document was created using:
 
