@@ -65,20 +65,23 @@ Choose either **Node.js** (`app/node/`) or **Python** (`app/python/`). Fill in t
 Create a `Dockerfile` in your chosen language directory (`app/node/` or `app/python/`).
 
 **Tasks:**
-1. Write a Dockerfile that:
+1. Copy the shared frontend into your language directory: `cp -r ../public .` (from `app/node/` or `app/python/`)
+2. Update the static folder path in your server — the starter code uses `"../public"` for local development, but inside Docker it should be `"public"` (Node: `path.join(__dirname, "public")`, Python: `static_folder="public"`)
+3. Write a Dockerfile that:
    - Starts from a slim base image
    - Sets a working directory
    - Copies dependency files and installs them
    - Copies the rest of the source code (including the `public/` folder)
    - Exposes port 3000
    - Defines the startup command
-2. Build the image: `docker build -t guestbook:dev .`
-3. (Optional) Test locally: `docker run --rm -p 3000:3000 -e DB_HOST=host.docker.internal -e DB_PASSWORD=test guestbook:dev`
+4. Build the image: `docker build -t guestbook:dev .`
+5. (Optional) Test locally: `docker run --rm -p 3000:3000 -e DB_HOST=host.docker.internal -e DB_PASSWORD=test guestbook:dev`
 
 > **Hints:**
 > - Refer to the **Docker guide — Writing a Dockerfile** section.
-> - **Node.js:** Base image `node:20-slim`. Install with `npm ci`. Start with `node server.js`. Copy `../public` to get the frontend.
-> - **Python:** Base image `python:3.12-slim`. Install with `pip install -r requirements.txt`. Start with `python server.py`. Copy `../public` to get the frontend.
+> - The `public/` folder is a sibling of your language directory, not inside it. Docker can only access files within the build context, so you must copy `public/` into your language directory before building.
+> - **Node.js:** Base image `node:20-slim`. Install with `npm install`. Start with `node server.js`.
+> - **Python:** Base image `python:3.12-slim`. Install with `pip install -r requirements.txt`. Start with `python server.py`.
 > - Key Dockerfile instructions: `FROM`, `WORKDIR`, `COPY`, `RUN`, `EXPOSE`, `CMD`.
 > - Consider adding a `.dockerignore` to exclude `node_modules` or `__pycache__`.
 > - **Bonus:** Use a multi-stage build to keep the final image small.

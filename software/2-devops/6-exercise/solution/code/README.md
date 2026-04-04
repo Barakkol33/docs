@@ -13,15 +13,12 @@ Both backends serve the same `public/` folder and expose the same API.
 
 ## Build the Docker image
 
-Choose one language. Run from the language directory:
+Choose one language. Copy the shared frontend into the language directory, then build:
 
 ### Node.js
 
 ```bash
-# Copy the shared frontend into the build context
-cp -r ../public node/public
-
-# Build
+cp -r public node/public
 cd node
 docker build -t guestbook:dev .
 ```
@@ -29,10 +26,7 @@ docker build -t guestbook:dev .
 ### Python
 
 ```bash
-# Copy the shared frontend into the build context
-cp -r ../public python/public
-
-# Build
+cp -r public python/public
 cd python
 docker build -t guestbook:dev .
 ```

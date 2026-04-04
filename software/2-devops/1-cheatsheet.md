@@ -4,6 +4,14 @@ A practical cheatsheet with the commands, patterns, and components you'll use mo
 
 ---
 
+## Platform note
+
+**Windows users:** If using WSL, all commands below work as-is. For native PowerShell equivalents, see [Windows cheatsheet](1-cheatsheet-windows.md).
+
+**macOS users:** Most commands work the same. Differences are noted in the [macOS differences](#macos-differences) section at the end of the Linux cheatsheet.
+
+---
+
 ## Linux
 
 ### Files and navigation
@@ -79,6 +87,27 @@ cat data.json | jq 'length'                        # count items in array
 | `/proc/<pid>/` | Process info |
 | `~/.bashrc` | Shell config |
 | `~/.ssh/` | SSH keys and config |
+
+### macOS differences
+
+Most Linux commands work identically on macOS. Key differences:
+
+| Linux | macOS | Notes |
+|---|---|---|
+| `ss -tlnp` | `lsof -iTCP -sTCP:LISTEN -nP` | List listening TCP ports |
+| `ip addr show` | `ifconfig` | Network interfaces |
+| `lsof -i :8080` | `lsof -i :8080` | Same on both |
+| `base64 -d` | `base64 -D` (or `base64 --decode`) | Decode base64 |
+| `sed -i 's/old/new/' file` | `sed -i '' 's/old/new/' file` | In-place edit requires `''` on macOS |
+| `grep -rn "error" .` | `grep -rn "error" .` | Same (or use `brew install grep` for GNU grep as `ggrep`) |
+| `/var/log/` | `/var/log/` | Same, but fewer system logs — use `log show` for macOS system logs |
+| `~/.bashrc` | `~/.zshrc` | macOS defaults to zsh |
+
+**Missing tools:** `tree`, `watch`, and GNU coreutils aren't pre-installed. Install with:
+
+```bash
+brew install tree watch coreutils
+```
 
 ---
 

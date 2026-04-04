@@ -24,7 +24,7 @@ PORT = 3000
 #      - decode_responses=True makes Redis return strings instead of bytes
 #   3. Return the client
 #
-# Redis docs: https://redis-py.readthedocs.io/
+# Redis docs: https://redis.io/docs/latest/
 # ---------------------------------------------------------------------------
 def connect_to_redis():
     # === YOUR CODE HERE ===

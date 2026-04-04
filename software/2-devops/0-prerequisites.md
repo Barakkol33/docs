@@ -15,6 +15,8 @@ Either works. The important thing is that you're not reading raw markdown — ta
 
 ## 1. Install tools
 
+### Linux
+
 ```bash
 # Docker
 sudo apt-get update && sudo apt-get install -y docker.io docker-compose-v2
@@ -39,6 +41,42 @@ tar xzf k9s.tar.gz k9s && sudo install k9s /usr/local/bin/k9s && rm k9s k9s.tar.
 # jq (used in examples)
 sudo apt-get install -y jq
 ```
+
+### macOS
+
+```bash
+# Docker — install Docker Desktop from https://docs.docker.com/desktop/setup/install/mac-install/
+# Docker Desktop includes Docker Engine, Docker CLI, and Docker Compose
+
+# kubectl
+brew install kubectl
+
+# kind
+brew install kind
+
+# Helm
+brew install helm
+
+# k9s (optional but recommended)
+brew install derailed/k9s/k9s
+
+# jq (used in examples)
+brew install jq
+```
+
+### Windows
+
+Install [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install) first — all guides and commands assume a Linux shell:
+
+```powershell
+# Run in PowerShell as Administrator
+wsl --install
+# Restart, then open the Ubuntu terminal for all remaining steps
+```
+
+Then install [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) with the **WSL 2 backend** enabled (Settings → General → "Use the WSL 2 based engine"). Docker Desktop makes the `docker` command available inside WSL automatically.
+
+Once inside WSL, install the remaining tools using the **Linux** instructions above.
 
 ---
 

@@ -88,7 +88,7 @@ An in-memory key-value data store. Extremely fast; used as cache, message broker
 
 **Resources:**
 
-- https://try.redis.io/
+- https://redis.io/try-free/
 
 ---
 
