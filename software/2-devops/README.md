@@ -33,7 +33,14 @@ Read the chapters in order. Each one builds on the previous.
 
 | File | Topic |
 |---|---|
-| [databases.md](3-data-sources/databases.md) | Databases — relational, document, key-value, columnar, when to use which |
+| [databases.md](3-data-sources/databases.md) | Databases — overview, when to use which, Elasticsearch, MongoDB, Redis, ClickHouse |
+| [postgresql.md](3-data-sources/databases/postgresql.md) | PostgreSQL — relational default: MVCC, indexes, replication, psql |
+| [mysql.md](3-data-sources/databases/mysql.md) | MySQL / MariaDB — InnoDB, binlog, replication |
+| [sqlite.md](3-data-sources/databases/sqlite.md) | SQLite — embedded, serverless, single-file database |
+| [cassandra.md](3-data-sources/databases/cassandra.md) | Cassandra — wide-column, partition keys, consistency levels, CQL |
+| [dynamodb.md](3-data-sources/databases/dynamodb.md) | DynamoDB — serverless key-value on AWS, keys, indexes, capacity |
+| [neo4j.md](3-data-sources/databases/neo4j.md) | Neo4j — graph database and Cypher |
+| [timeseries.md](3-data-sources/databases/timeseries.md) | InfluxDB & TimescaleDB — time-series data |
 | [kakfa.md](3-data-sources/kakfa.md) | Kafka — event streaming, topics, partitions, consumers |
 
 ### 4. Observability
@@ -48,7 +55,10 @@ Read the chapters in order. Each one builds on the previous.
 
 | File | Topic |
 |---|---|
-| [cloud.md](5-cloud/cloud.md) | Cloud — compute, storage, managed services, AWS basics |
+| [cloud.md](5-cloud/cloud.md) | Cloud — core concepts, service mapping across AWS / GCP / Azure |
+| [aws.md](5-cloud/aws.md) | AWS — IAM, VPC, EC2, EKS, S3, RDS, Lambda, CLI |
+| [gcp.md](5-cloud/gcp.md) | GCP — projects, IAM, VPC, GKE, Cloud Run, BigQuery, gcloud |
+| [azure.md](5-cloud/azure.md) | Azure — subscriptions, Entra ID, VNet, AKS, Blob, Cosmos DB, az CLI |
 
 ## Quick Reference
 

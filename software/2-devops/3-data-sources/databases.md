@@ -1,5 +1,45 @@
 # Databases
 
+There is no "best" database, only the best fit for a workload. This page is the map; each database has its own section or page with key concepts and examples.
+
+## Choosing a database
+
+| Type | Examples | Best for | Watch out for |
+|---|---|---|---|
+| **Relational (SQL)** | [PostgreSQL](databases/postgresql.md), [MySQL/MariaDB](databases/mysql.md), [SQLite](databases/sqlite.md), SQL Server, Oracle | Transactions, structured data, joins, integrity. **The default choice.** | Scaling writes beyond one primary needs effort |
+| **Document** | [MongoDB](#mongodb), Couchbase, Firestore | Flexible/hierarchical JSON, evolving schemas | Joins and multi-document transactions are weaker |
+| **Key-value** | [Redis](#redis), [DynamoDB](databases/dynamodb.md), etcd, Memcached | Caching, sessions, lookups by key at massive scale | Query only by key; limited ad-hoc queries |
+| **Wide-column** | [Cassandra](databases/cassandra.md), ScyllaDB, HBase, Bigtable | Huge write-heavy, multi-DC, always-on | Must model per query; no joins |
+| **Columnar / OLAP** | [ClickHouse](#clickhouse), BigQuery, Redshift, Snowflake | Analytics and aggregations over billions of rows | Poor at frequent single-row updates |
+| **Search** | [Elasticsearch](#elasticsearch), OpenSearch, Solr | Full-text search, log search, faceting | Not a system of record |
+| **Graph** | [Neo4j](databases/neo4j.md), Neptune | Highly connected data, recommendations, fraud | Not for plain tabular data |
+| **Time-series** | [InfluxDB, TimescaleDB](databases/timeseries.md), Prometheus | Metrics, IoT, events over time | High-cardinality tags |
+
+### Pages in this section
+
+| Page | Type |
+|---|---|
+| [PostgreSQL](databases/postgresql.md) | Relational |
+| [MySQL / MariaDB](databases/mysql.md) | Relational |
+| [SQLite](databases/sqlite.md) | Embedded relational |
+| [Cassandra](databases/cassandra.md) | Wide-column |
+| [DynamoDB](databases/dynamodb.md) | Managed key-value / document (AWS) |
+| [Neo4j](databases/neo4j.md) | Graph |
+| [InfluxDB & TimescaleDB](databases/timeseries.md) | Time-series |
+| [Elasticsearch](#elasticsearch), [MongoDB](#mongodb), [Redis](#redis), [ClickHouse](#clickhouse) | Below on this page |
+
+### Concepts that apply to every database
+
+- **ACID** – _Atomicity_ (all or nothing), _Consistency_ (constraints hold), _Isolation_ (concurrent transactions don't interfere), _Durability_ (committed data survives crashes). Classic relational guarantees.
+- **CAP theorem** – During a network **P**artition, a distributed system must choose between **C**onsistency and **A**vailability. Many NoSQL systems pick availability (eventual consistency); many SQL systems pick consistency.
+- **Eventual consistency** – Replicas may briefly disagree but converge.
+- **Replication** – Copies of data on several nodes: high availability + read scaling.
+- **Sharding / partitioning** – Splitting data across nodes: write scaling.
+- **Indexes** – Make reads fast, writes slower, use disk. Index what you filter and join on.
+- **Backups** – A replica is **not** a backup (a bad `DELETE` replicates too). Test restores, and know your **RPO** (how much data you can lose) and **RTO** (how long recovery may take).
+- **Connection pooling** – Databases handle a limited number of connections; use a pooler or app-level pool.
+- **Running in Kubernetes** – Stateful databases need StatefulSets, PersistentVolumes and a backup story. In production consider an operator or a managed cloud service (see [cloud](../5-cloud/cloud.md)).
+
 ---
 
 ## Elasticsearch
